@@ -1,99 +1,75 @@
 <div align="center">
-  <img src="assets/app_icon.png" alt="Kelivo Icon" width="100" />
-  <h1>Kelivo</h1>
+  <img src="assets/app_icon.png" alt="白子图标" width="112" />
+  <h1>白子</h1>
+  <p>面向日常聊天的 LLM 客户端，配置只保留真正需要填写的内容。</p>
 
-一个 Flutter LLM 聊天客户端
-
-  <a href="https://discord.gg/Tb8DyvvV5T" target="_blank">
-    <img src="https://img.shields.io/badge/Join%20our%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord"/>
-  </a>
-  <a href="https://qm.qq.com/q/OQaXetKssC" target="_blank" style="margin-left: 6px;">
-    <img src="https://img.shields.io/badge/Join%20QQ%20Group-%230366CC?style=for-the-badge&logo=qq&logoColor=white" alt="Join QQ Group"/>
-  </a>
-
-[English](README.md) | 简体中文
+  <a href="https://github.com/INKT-love/Baizi/releases/latest">下载</a>
+  ·
+  <a href="README.md">English</a>
 </div>
 
-<div align="center">
-  <img src="docx/screenshot_1.png" alt="聊天界面" width="150" />
-  <img src="docx/screenshot_2.png" alt="模型选择" width="150" />
-  <img src="docx/screenshot_3.png" alt="工具调用" width="150" />
-  <img src="docx/screenshot_4.png" alt="网络搜索" width="150" />
-</div>
+## 项目说明
 
-## 🚀 下载
+白子将连接配置简化为三步：填写一个 API Key、刷新模型列表、选择模型。网关地址固定为：
 
-[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/us/app/kelivo/id6752122930)
+```text
+https://api.inktandwkx.top:51000/v1
+```
 
+应用会按模型自动选择请求格式：
 
-🔗 [下载最新版本](https://github.com/Chevey339/kelivo/releases/latest)
+- 模型名包含 `claude` 时，使用 Anthropic Messages 格式。
+- 其他模型使用 OpenAI Chat Completions 格式。
 
-🔗 [TestFlight](https://testflight.apple.com/join/erbGGykR) 参与测试版体验。
+模型列表直接从网关获取，不需要配置供应商地址、协议或请求模板。
 
-## 💖 赞助
+## 功能
 
-感谢 [siliconflow.cn](https://siliconflow.cn) 与我们合作提供可免费使用的模型。
+- 首次启动引导：只填写一个 API Key，再选择模型即可开始。
+- OpenAI 与 Anthropic 两种格式统一流式输出。
+- 可搜索的模型选择器，支持刷新、最近使用和收藏模型。
+- 支持导入酒馆（SillyTavern）PNG 与 JSON 角色卡，可预览并选择新建副本或覆盖角色。
+- 助手管理、聊天记录、Markdown 渲染、图片输入、备份与恢复。
+- 将进阶选项收纳到高级设置，不干扰日常使用。
+- API Key 使用系统安全存储保存于本机。
+- 工程支持 Android、iOS、Windows、macOS、Linux 与 Web。
 
-## ✨ 功能特性
+## 下载与安装
 
-- 🎨 **现代化设计** - Material You 设计语言，支持动态主题色(Android12+)
-- 🌙 **深色模式** - 完美适配深色主题，保护您的眼睛
-- 🌍 **多语言支持** - 支持中文和英文界面
-- 🖥️ **多平台支持** - 移动端与桌面端均支持（Android/iOS/Harmony、Windows/macOS/Linux）
-- 🔄 **多供应商支持** - 支持 OpenAI、Google Gemini、Anthropic 等主流 AI 供应商
-- 🤖 **自定义助手** - 创建和管理个性化 AI 助手
-- 🖼️ **多模态输入** - 支持图片、文本文档、PDF、Word 文档等多种格式
-- 📝 **Markdown 渲染** - 完整支持代码高亮、LaTeX 公式、表格等
-- 🎙️ **语音服务** - 内置系统 TTS，同时支持 OpenAI / Google Gemini / ElevenLabs 语音服务器
-- 🛠️ **MCP 支持** - Model Context Protocol 工具集成
-- 🧰 **内置 MCP 工具** - 内置 fetch MCP 工具
-- 🔍 **网络搜索** - 集成多种搜索引擎（Bing、DuckDuckGo、Exa、Tavily、智谱、LinkUp、Brave、Metaso、SearXNG、Ollama、Jina、Perplexity、Bocha、Serper、Grok）
-- 🧩 **提示词变量** - 支持模型名称、时间等动态变量
-- 📤 **二维码分享** - 通过二维码导出和导入供应商配置
-- 💾 **数据备份** - 支持聊天记录备份和恢复
-- 🌐 **自定义请求** - 支持自定义 HTTP 请求头和请求体
-- 🔡 **自定义字体** - 支持自定义字体（系统字体 / Google Fonts）
-- ⚙️ **Android 后台生成对话** - 可在后台持续生成消息（可在设置中开启）。
+前往 [Releases](https://github.com/INKT-love/Baizi/releases/latest) 下载 Android 安装包。
 
-## 📱 平台支持
+- **ARM64-v8a**：绝大多数现代 Android 手机选择此版本。
+- **ARMv7**：较旧的 32 位 Android 设备使用。
+- **x86_64**：适用于兼容的模拟器或设备。
 
-- ✅ Android
-- ✅ iOS
-- ✅ Harmony ([kelivo-ohos](https://github.com/Chevey339/kelivo-ohos))
-- ✅ Windows
-- ✅ macOS
-- ✅ Linux
+当前版本为 [v1.1.18](https://github.com/INKT-love/Baizi/releases/tag/v1.1.18)。
 
-## 🤝 贡献指南
+## 快速开始
 
-欢迎提交 Pull Request 或创建 Issue！
+1. 打开白子并填写 API Key。
+2. 刷新可用模型。
+3. 选择模型后开始聊天。
 
-1. Fork 本仓库
-2. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交您的更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启一个 Pull Request
+选择 Claude 模型会自动切换到 Anthropic 格式；选择其他模型则使用 OpenAI 兼容格式。
 
-## ❤️ 致谢
+## 开发
 
-特别感谢 [RikkaHub](https://github.com/re-ovo/rikkahub) 项目提供的 UI 设计灵感。Kelivo 的界面设计深受 RikkaHub 优美且实用的设计启发。
+环境要求：
 
-## ⭐ Star History
+- Flutter `>= 3.44.1`
+- Dart SDK `^3.12.1`
 
-如果你喜欢这个项目，可以给个Star ⭐
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release --split-per-abi
+```
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Chevey339/kelivo&type=Date)](https://star-history.com/#Chevey339/kelivo&Date)
+## 参与贡献
 
-## 📄 许可证
+欢迎通过 [INKT-love/Baizi](https://github.com/INKT-love/Baizi) 提交 Issue 或 Pull Request。
 
-本项目采用 AGPL-3.0 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+## 许可证
 
-## 📞 联系我们
-
-- Issue: [GitHub Issues](https://github.com/Chevey339/kelivo/issues)
-
----
-
-<div align="center">
-Made with ❤️ using Flutter
-</div>
+本项目使用 [AGPL-3.0 许可证](LICENSE)。

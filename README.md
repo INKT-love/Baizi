@@ -1,99 +1,75 @@
 <div align="center">
-  <img src="assets/app_icon.png" alt="Kelivo Icon" width="100" />
-  <h1>Kelivo</h1>
+  <img src="assets/app_icon.png" alt="Baizi icon" width="112" />
+  <h1>Baizi</h1>
+  <p>A focused LLM chat client with a simple, guided setup.</p>
 
-A Flutter LLM Chat Client
-
-  <a href="https://discord.gg/Tb8DyvvV5T" target="_blank">
-    <img src="https://img.shields.io/badge/Join%20our%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord"/>
-  </a>
-  <a href="https://qm.qq.com/q/OQaXetKssC" target="_blank" style="margin-left: 6px;">
-    <img src="https://img.shields.io/badge/Join%20QQ%20Group-%230366CC?style=for-the-badge&logo=qq&logoColor=white" alt="Join QQ Group"/>
-  </a>
-
-
-English | [简体中文](README_ZH_CN.md)
+  <a href="https://github.com/INKT-love/Baizi/releases/latest">Download</a>
+  ·
+  <a href="README_ZH_CN.md">简体中文</a>
 </div>
 
-<div align="center">
-  <img src="docx/screenshot_1.png" alt="Chat Screen" width="150" />
-  <img src="docx/screenshot_2.png" alt="Model Selection" width="150" />
-  <img src="docx/screenshot_3.png" alt="Tool Calling" width="150" />
-  <img src="docx/screenshot_4.png" alt="Web Search" width="150" />
-</div>
+## Overview
 
-## 🚀 Download
+Baizi keeps connection setup deliberately small: enter one API key, refresh the model list, and choose a model. The gateway endpoint is fixed to:
 
-[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/us/app/kelivo/id6752122930)
+```text
+https://api.inktandwkx.top:51000/v1
+```
 
-🔗 [Download the latest version](https://github.com/Chevey339/kelivo/releases/latest)
+The app selects the request format automatically:
 
-🔗 [TestFlight](https://testflight.apple.com/join/erbGGykR) for beta testing.
+- Models whose name contains `claude` use the Anthropic Messages format.
+- All other models use the OpenAI Chat Completions format.
 
-## 💖 Sponsors
+Model choices are loaded from the gateway, so there is no provider URL, protocol, or request-template configuration to complete before chatting.
 
-Thanks to [siliconflow.cn](https://siliconflow.cn) for providing free models in cooperation with us.
+## Features
 
-## ✨ Features
+- Guided first-run setup for one API key and a model choice.
+- Streaming responses for both supported request formats.
+- Searchable model picker with refresh, recent models, and pinned models.
+- Import SillyTavern character cards from PNG or JSON, with preview and overwrite/copy choices.
+- Assistants, chat history, Markdown rendering, image input, backups, and restore.
+- Advanced settings for experienced users without complicating initial setup.
+- Local API-key storage through the platform secure-storage service.
+- Android, iOS, Windows, macOS, Linux, and Web project targets.
 
-- 🎨 **Modern Design** - Material You design language with dynamic color theming support (Android 12+).
-- 🌙 **Dark Mode** - Perfectly adapted dark theme to protect your eyes.
-- 🌍 **Multi-language Support** - Supports both English and Chinese interfaces.
-- 🖥️ **Multi-platform Support** - Mobile (Android/iOS/Harmony) and Desktop (Windows/macOS/Linux).
-- 🔄 **Multi-provider Support** - Supports major AI providers like OpenAI, Google Gemini, Anthropic, etc.
-- 🤖 **Custom Assistants** - Create and manage personalized AI assistants.
-- 🖼️ **Multimodal Input** - Supports various formats including images, text documents, PDFs, Word documents, etc.
-- 📝 **Markdown Rendering** - Full support for code highlighting, LaTeX formulas, tables, and more.
-- 🎙️ **Voice/TTS Providers** - Built-in system TTS plus OpenAI / Google Gemini / ElevenLabs voice servers.
-- 🛠️ **MCP Support** - Model Context Protocol tool integration.
-- 🧰 **Built-in MCP Tools** - Includes a built-in MCP Fetch tool.
-- 🔍 **Web Search** - Integrated with multiple search engines (Bing, DuckDuckGo, Exa, Tavily, Zhipu, LinkUp, Brave, Metaso, SearXNG, Ollama, Jina, Perplexity, Bocha, Serper, Grok).
-- 🧩 **Prompt Variables** - Supports dynamic variables like model name, time, etc.
-- 📤 **QR Code Sharing** - Export and import provider configurations via QR codes.
-- 💾 **Data Backup** - Supports chat history backup and restoration.
-- 🌐 **Custom Requests** - Supports custom HTTP request headers and bodies.
-- 🔡 **Custom Fonts** - Bring your own fonts (system fonts / Google Fonts).
-- ⚙️ **Android Background Generation** - Keep chat generation running in the background (optional setting).
+## Install
 
-## 📱 Platform Support
+Download the current Android build from [Releases](https://github.com/INKT-love/Baizi/releases/latest).
 
-- ✅ Android
-- ✅ iOS
-- ✅ Harmony ([kelivo-ohos](https://github.com/Chevey339/kelivo-ohos))
-- ✅ Windows
-- ✅ macOS
-- ✅ Linux
+- **ARM64-v8a**: recommended for most modern Android devices.
+- **ARMv7**: for older 32-bit Android devices.
+- **x86_64**: for compatible emulators and devices.
 
-## 🤝 Contribution Guide
+The current release is [v1.1.18](https://github.com/INKT-love/Baizi/releases/tag/v1.1.18).
 
-Pull Requests and Issues are welcome!
+## Quick Start
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Open Baizi and enter your API key.
+2. Refresh the available models.
+3. Choose a model and begin a chat.
 
-## ❤️ Acknowledgements
+Selecting a Claude model automatically switches the request format. Selecting any other model uses the OpenAI-compatible format.
 
-Special thanks to the [RikkaHub](https://github.com/re-ovo/rikkahub) project for the UI design inspiration. Kelivo's interface design is heavily inspired by RikkaHub's beautiful and practical design.
+## Development
 
-## ⭐ Star History
+Requirements:
 
-If you like this project, please give it a star ⭐
+- Flutter `>= 3.44.1`
+- Dart SDK `^3.12.1`
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Chevey339/kelivo&type=Date)](https://star-history.com/#Chevey339/kelivo&Date)
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release --split-per-abi
+```
 
-## 📄 License
+## Contributing
 
-This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+Issues and pull requests are welcome at [INKT-love/Baizi](https://github.com/INKT-love/Baizi).
 
-## 📞 Contact Us
+## License
 
-- Issue: [GitHub Issues](https://github.com/Chevey339/kelivo/issues)
-
----
-
-<div align="center">
-Made with ❤️ using Flutter
-</div>
+Baizi is distributed under the [AGPL-3.0 license](LICENSE).

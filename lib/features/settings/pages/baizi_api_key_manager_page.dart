@@ -169,6 +169,7 @@ class _BaiziApiKeyManagerPageState extends State<BaiziApiKeyManagerPage> {
                   if (includeKey) ...[
                     const SizedBox(height: 16),
                     TextField(
+                      key: ValueKey<bool>(obscureKey),
                       controller: keyController,
                       obscureText: obscureKey,
                       autocorrect: false,
@@ -177,20 +178,20 @@ class _BaiziApiKeyManagerPageState extends State<BaiziApiKeyManagerPage> {
                       onChanged: (_) => setDialogState(() {}),
                       decoration: InputDecoration(
                         labelText: l10n.baiziApiKeyLabel,
-                        suffixIcon: Tooltip(
-                          message: obscureKey
+                        suffixIconConstraints: const BoxConstraints.tightFor(
+                          width: 48,
+                          height: 48,
+                        ),
+                        suffixIcon: IconButton(
+                          tooltip: obscureKey
                               ? l10n.baiziShowKeyTooltip
                               : l10n.baiziHideKeyTooltip,
-                          child: IosIconButton(
-                            icon: obscureKey ? Lucide.Eye : Lucide.EyeOff,
-                            size: 18,
-                            minSize: 40,
-                            semanticLabel: obscureKey
-                                ? l10n.baiziShowKeyTooltip
-                                : l10n.baiziHideKeyTooltip,
-                            onTap: () =>
-                                setDialogState(() => obscureKey = !obscureKey),
+                          icon: Icon(
+                            obscureKey ? Lucide.Eye : Lucide.EyeOff,
+                            size: 20,
                           ),
+                          onPressed: () =>
+                              setDialogState(() => obscureKey = !obscureKey),
                         ),
                       ),
                     ),

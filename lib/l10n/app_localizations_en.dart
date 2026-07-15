@@ -5763,4 +5763,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPageAdvancedFeatures => 'Advanced';
+
+  @override
+  String get baiziKeyManagerTitle => 'Key management';
+
+  @override
+  String get baiziKeyManagerAdd => 'Add key';
+
+  @override
+  String get baiziKeyManagerAddTitle => 'Add API key';
+
+  @override
+  String get baiziKeyManagerRenameTitle => 'Rename key';
+
+  @override
+  String get baiziKeyManagerNameLabel => 'Name';
+
+  @override
+  String get baiziKeyManagerNoKeys => 'No saved API keys';
+
+  @override
+  String get baiziKeyManagerActive => 'In use';
+
+  @override
+  String get baiziKeyManagerDeleteTitle => 'Delete API key?';
+
+  @override
+  String baiziKeyManagerDeleteMessage(String name) {
+    return 'Delete \"$name\" from this device? You will need to enter it again to use it.';
+  }
+
+  @override
+  String get baiziKeyManagerSwitching => 'Switching key...';
+
+  @override
+  String get baiziKeyManagerRenameTooltip => 'Rename key';
+
+  @override
+  String get baiziKeyManagerDeleteTooltip => 'Delete key';
 }

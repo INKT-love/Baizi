@@ -13,6 +13,7 @@ import 'package:Kelivo/theme/app_font_weights.dart';
 import '../../model/widgets/baizi_model_select_sheet.dart';
 import '../../setup/pages/baizi_setup_page.dart';
 import 'advanced_settings_page.dart';
+import 'baizi_api_key_manager_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -185,14 +186,12 @@ class SettingsPage extends StatelessWidget {
                 icon: Lucide.KeyRound,
                 label: l10n.settingsPageApiKey,
                 detailText: settings.hasBaiziApiKey
-                    ? l10n.baiziConfigured
+                    ? settings.activeBaiziApiKeyProfileLabel ??
+                          l10n.baiziConfigured
                     : l10n.baiziNotConfigured,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => const BaiziSetupPage(
-                      allowBack: true,
-                      forceKeyEntry: true,
-                    ),
+                    builder: (_) => const BaiziApiKeyManagerPage(),
                   ),
                 ),
               ),

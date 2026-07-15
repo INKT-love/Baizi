@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/ios_primary_button.dart';
 import '../../../shared/widgets/ios_tactile.dart';
 import '../../model/widgets/baizi_model_select_sheet.dart';
+import '../../settings/pages/baizi_api_key_manager_page.dart';
 
 class BaiziSetupPage extends StatefulWidget {
   const BaiziSetupPage({
@@ -101,6 +102,22 @@ class _BaiziSetupPageState extends State<BaiziSetupPage> {
   Future<void> _selectModel(String modelId) async {
     await context.read<SettingsProvider>().setCurrentModel('baizi', modelId);
     if (widget.allowBack && mounted) Navigator.of(context).pop();
+  }
+
+  Future<void> _openKeyManager() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const BaiziApiKeyManagerPage()),
+    );
+    if (!mounted) return;
+    final settings = context.read<SettingsProvider>();
+    setState(() {
+      _showKeyEntry = !settings.hasBaiziApiKey;
+      _catalogError = null;
+      _storageError = false;
+    });
+    if (settings.hasBaiziApiKey && settings.baiziModels.isEmpty) {
+      await _refreshModels();
+    }
   }
 
   String? _errorText(AppLocalizations l10n) {
@@ -311,7 +328,7 @@ class _BaiziSetupPageState extends State<BaiziSetupPage> {
                   size: 20,
                   minSize: 44,
                   semanticLabel: l10n.baiziChangeKey,
-                  onTap: () => setState(() => _showKeyEntry = true),
+                  onTap: _openKeyManager,
                 ),
               ),
             ],

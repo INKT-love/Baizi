@@ -397,6 +397,8 @@ class SettingsProvider extends ChangeNotifier {
   Object? _initializationError;
   Object? _apiKeyStorageError;
   String? _baiziApiKey;
+  List<BaiziApiKeyProfile> _baiziApiKeyProfiles = const <BaiziApiKeyProfile>[];
+  String? _activeBaiziApiKeyProfileId;
   List<String> _baiziModels = const <String>[];
   List<String> _recentBaiziModels = const <String>[];
 
@@ -404,6 +406,19 @@ class SettingsProvider extends ChangeNotifier {
   Object? get initializationError => _initializationError;
   Object? get apiKeyStorageError => _apiKeyStorageError;
   bool get hasBaiziApiKey => (_baiziApiKey ?? '').isNotEmpty;
+  List<BaiziApiKeyProfile> get baiziApiKeyProfiles =>
+      List<BaiziApiKeyProfile>.unmodifiable(_baiziApiKeyProfiles);
+  String? get activeBaiziApiKeyProfileId => _activeBaiziApiKeyProfileId;
+  BaiziApiKeyProfile? get activeBaiziApiKeyProfile {
+    final activeProfileId = _activeBaiziApiKeyProfileId;
+    if (activeProfileId == null) return null;
+    for (final profile in _baiziApiKeyProfiles) {
+      if (profile.id == activeProfileId) return profile;
+    }
+    return null;
+  }
+
+  String? get activeBaiziApiKeyProfileLabel => activeBaiziApiKeyProfile?.label;
   List<String> get baiziModels => List<String>.unmodifiable(_baiziModels);
   List<String> get recentBaiziModels =>
       List<String>.unmodifiable(_recentBaiziModels);
@@ -711,15 +726,20 @@ class SettingsProvider extends ChangeNotifier {
 
     bool secureStorageReady = false;
     try {
-      _baiziApiKey = await _apiKeyStore.read();
-      if (_baiziApiKey == null && legacyKey != null) {
+      var vault = await _apiKeyStore.readVault();
+      if (vault.isEmpty && legacyKey != null) {
         await _apiKeyStore.write(legacyKey);
-        _baiziApiKey = legacyKey;
+        vault = await _apiKeyStore.readVault();
       }
+      _baiziApiKeyProfiles = vault.profiles;
+      _activeBaiziApiKeyProfileId = vault.activeProfileId;
+      _baiziApiKey = await _apiKeyStore.read();
       _apiKeyStorageError = null;
       secureStorageReady = true;
     } catch (error, stackTrace) {
       _baiziApiKey = null;
+      _baiziApiKeyProfiles = const <BaiziApiKeyProfile>[];
+      _activeBaiziApiKeyProfileId = null;
       _apiKeyStorageError = error;
       debugPrint('[SettingsProvider] secure API key storage failed: $error');
       debugPrint('$stackTrace');
@@ -2726,14 +2746,15 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> followSystem() => setThemeMode(ThemeMode.system);
 
   Future<void> setBaiziApiKey(String value) async {
+    final candidate = value.trim();
+    if (candidate.isEmpty) {
+      await clearBaiziApiKey();
+      return;
+    }
     try {
-      await _apiKeyStore.write(value);
-      _baiziApiKey = value.trim().isEmpty ? null : value.trim();
-      _apiKeyStorageError = null;
-      _syncBaiziProviderConfig();
-      final prefs = await SharedPreferences.getInstance();
-      await _persistSanitizedProviderConfigs(prefs);
-      notifyListeners();
+      await _apiKeyStore.write(candidate);
+      final vault = await _apiKeyStore.readVault();
+      await _applyBaiziApiKeyVault(vault, apiKey: candidate);
     } catch (error) {
       _apiKeyStorageError = error;
       notifyListeners();
@@ -2743,6 +2764,7 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<List<String>> configureBaiziApiKey(
     String value, {
+    String? label,
     http.Client? client,
   }) async {
     final candidate = value.trim();
@@ -2752,20 +2774,114 @@ class SettingsProvider extends ChangeNotifier {
     );
 
     try {
-      await _apiKeyStore.write(candidate);
-      final prefs = await SharedPreferences.getInstance();
-      _baiziApiKey = candidate;
-      _baiziModels = models;
-      _recentBaiziModels = List<String>.unmodifiable(
-        _recentBaiziModels.where(models.contains),
+      final vault = await _apiKeyStore.readVault();
+      if (vault.activeProfile == null) {
+        await _apiKeyStore.addProfile(
+          id: _newBaiziApiKeyProfileId(),
+          label: label?.trim().isNotEmpty == true
+              ? label!.trim()
+              : 'Key ${vault.profiles.length + 1}',
+          key: candidate,
+        );
+      } else {
+        await _apiKeyStore.write(candidate);
+      }
+      await _applyBaiziApiKeyVault(
+        await _apiKeyStore.readVault(),
+        apiKey: candidate,
+        models: models,
       );
-      _apiKeyStorageError = null;
-      _syncBaiziProviderConfig();
-      await prefs.setStringList(_baiziModelsCacheKey, models);
-      await prefs.setStringList(_baiziRecentModelsKey, _recentBaiziModels);
-      await _persistSanitizedProviderConfigs(prefs);
-      notifyListeners();
       return models;
+    } catch (error) {
+      _apiKeyStorageError = error;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<List<String>> addBaiziApiKeyProfile(
+    String label,
+    String value, {
+    http.Client? client,
+  }) async {
+    final candidate = value.trim();
+    final models = await _modelCatalogService.fetchModels(
+      apiKey: candidate,
+      client: client,
+    );
+    try {
+      await _apiKeyStore.addProfile(
+        id: _newBaiziApiKeyProfileId(),
+        label: label,
+        key: candidate,
+      );
+      await _applyBaiziApiKeyVault(
+        await _apiKeyStore.readVault(),
+        apiKey: candidate,
+        models: models,
+      );
+      return models;
+    } catch (error) {
+      _apiKeyStorageError = error;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> renameBaiziApiKeyProfile(String profileId, String label) async {
+    try {
+      final vault = await _apiKeyStore.renameProfile(profileId, label);
+      await _applyBaiziApiKeyVault(vault, apiKey: _baiziApiKey);
+    } catch (error) {
+      _apiKeyStorageError = error;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<List<String>> selectBaiziApiKeyProfile(
+    String profileId, {
+    http.Client? client,
+  }) async {
+    final key = await _apiKeyStore.readProfileKey(profileId);
+    if (key == null) {
+      throw StateError('The selected Baizi API key is unavailable');
+    }
+    final models = await _modelCatalogService.fetchModels(
+      apiKey: key,
+      client: client,
+    );
+    try {
+      final vault = await _apiKeyStore.selectProfile(profileId);
+      await _applyBaiziApiKeyVault(vault, apiKey: key, models: models);
+      return models;
+    } catch (error) {
+      _apiKeyStorageError = error;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> deleteBaiziApiKeyProfile(
+    String profileId, {
+    http.Client? client,
+  }) async {
+    try {
+      final vault = await _apiKeyStore.readVault();
+      final isActive = vault.activeProfileId == profileId;
+      if (isActive && vault.profiles.length > 1) {
+        final replacement = vault.profiles.firstWhere(
+          (profile) => profile.id != profileId,
+        );
+        await selectBaiziApiKeyProfile(replacement.id, client: client);
+      }
+
+      final nextVault = await _apiKeyStore.deleteProfile(profileId);
+      await _applyBaiziApiKeyVault(
+        nextVault,
+        apiKey: nextVault.isEmpty ? null : _baiziApiKey,
+        models: nextVault.isEmpty ? const <String>[] : null,
+      );
     } catch (error) {
       _apiKeyStorageError = error;
       notifyListeners();
@@ -2776,12 +2892,11 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> clearBaiziApiKey() async {
     try {
       await _apiKeyStore.clear();
-      _baiziApiKey = null;
-      _apiKeyStorageError = null;
-      _syncBaiziProviderConfig();
-      final prefs = await SharedPreferences.getInstance();
-      await _persistSanitizedProviderConfigs(prefs);
-      notifyListeners();
+      await _applyBaiziApiKeyVault(
+        await _apiKeyStore.readVault(),
+        apiKey: null,
+        models: const <String>[],
+      );
     } catch (error) {
       _apiKeyStorageError = error;
       notifyListeners();
@@ -2798,14 +2913,54 @@ class SettingsProvider extends ChangeNotifier {
       apiKey: apiKey,
       client: client,
     );
-    _baiziModels = models;
-    _syncBaiziProviderConfig();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_baiziModelsCacheKey, models);
-    await _persistSanitizedProviderConfigs(prefs);
-    notifyListeners();
+    final vault = await _apiKeyStore.readVault();
+    await _applyBaiziApiKeyVault(vault, apiKey: apiKey, models: models);
     return models;
   }
+
+  Future<void> _applyBaiziApiKeyVault(
+    BaiziApiKeyVault vault, {
+    required String? apiKey,
+    List<String>? models,
+  }) async {
+    _baiziApiKeyProfiles = vault.profiles;
+    _activeBaiziApiKeyProfileId = vault.activeProfileId;
+    _baiziApiKey = apiKey?.trim().isEmpty == false ? apiKey!.trim() : null;
+    if (models != null) {
+      _baiziModels = List<String>.unmodifiable(
+        models
+            .map((model) => model.trim())
+            .where((model) => model.isNotEmpty)
+            .toSet()
+            .toList(),
+      );
+      _recentBaiziModels = List<String>.unmodifiable(
+        _recentBaiziModels.where(_baiziModels.contains),
+      );
+    }
+
+    var clearedSelectedModel = false;
+    if (_currentModelId != null && !_baiziModels.contains(_currentModelId)) {
+      _currentModelProvider = null;
+      _currentModelId = null;
+      clearedSelectedModel = true;
+    }
+
+    _apiKeyStorageError = null;
+    _syncBaiziProviderConfig();
+    final prefs = await SharedPreferences.getInstance();
+    if (models != null) {
+      await prefs.setStringList(_baiziModelsCacheKey, _baiziModels);
+      await prefs.setStringList(_baiziRecentModelsKey, _recentBaiziModels);
+    }
+    if (clearedSelectedModel) {
+      await prefs.remove(_selectedModelKey);
+    }
+    await _persistSanitizedProviderConfigs(prefs);
+    notifyListeners();
+  }
+
+  String _newBaiziApiKeyProfileId() => const Uuid().v4();
 
   void _syncBaiziProviderConfig() {
     final safe = baiziProviderConfig.copyWith(
@@ -4576,6 +4731,11 @@ DO NOT GIVE ANSWERS OR DO HOMEWORK FOR THE USER. If the user asks a math or logi
     copy._providersOrder = _providersOrder;
     copy._themeMode = _themeMode;
     copy._providerConfigs = _providerConfigs;
+    copy._baiziApiKey = _baiziApiKey;
+    copy._baiziApiKeyProfiles = _baiziApiKeyProfiles;
+    copy._activeBaiziApiKeyProfileId = _activeBaiziApiKeyProfileId;
+    copy._baiziModels = _baiziModels;
+    copy._recentBaiziModels = _recentBaiziModels;
     copy._pinnedModels.addAll(_pinnedModels);
     copy._currentModelProvider = _currentModelProvider;
     copy._currentModelId = _currentModelId;

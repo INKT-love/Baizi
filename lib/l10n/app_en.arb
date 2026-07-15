@@ -2465,5 +2465,24 @@
   "baiziModelNotSelected": "Not selected",
   "settingsPageApiKey": "API Key",
   "settingsPageCurrentModel": "Current model",
-  "settingsPageAdvancedFeatures": "Advanced"
+  "settingsPageAdvancedFeatures": "Advanced",
+  "baiziKeyManagerTitle": "Key management",
+  "baiziKeyManagerAdd": "Add key",
+  "baiziKeyManagerAddTitle": "Add API key",
+  "baiziKeyManagerRenameTitle": "Rename key",
+  "baiziKeyManagerNameLabel": "Name",
+  "baiziKeyManagerNoKeys": "No saved API keys",
+  "baiziKeyManagerActive": "In use",
+  "baiziKeyManagerDeleteTitle": "Delete API key?",
+  "baiziKeyManagerDeleteMessage": "Delete \"{name}\" from this device? You will need to enter it again to use it.",
+  "@baiziKeyManagerDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "baiziKeyManagerSwitching": "Switching key...",
+  "baiziKeyManagerRenameTooltip": "Rename key",
+  "baiziKeyManagerDeleteTooltip": "Delete key"
 }

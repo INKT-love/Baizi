@@ -21,19 +21,57 @@ final class _MemoryBackend implements SecureApiKeyBackend {
 
 void main() {
   group('SecureApiKeyStore', () {
-    test('normalizes a key before secure persistence', () async {
+    test('normalizes a key and creates an active Key 1 profile', () async {
       final backend = _MemoryBackend();
       final store = SecureApiKeyStore(backend: backend);
 
       await store.write('  sk-test-value  ');
 
-      expect(backend.values, <String, String>{
-        SecureApiKeyStore.storageKey: 'sk-test-value',
-      });
+      final vault = await store.readVault();
+      expect(vault.profiles, hasLength(1));
+      expect(vault.activeProfile?.label, 'Key 1');
       expect(await store.read(), 'sk-test-value');
+      expect(backend.values[SecureApiKeyStore.storageKey], isNull);
     });
 
-    test('empty input removes the secure value', () async {
+    test('migrates the legacy single key into a named profile', () async {
+      final backend = _MemoryBackend()
+        ..values[SecureApiKeyStore.storageKey] = 'legacy-secret';
+      final store = SecureApiKeyStore(backend: backend);
+
+      final vault = await store.readVault();
+
+      expect(vault.activeProfile?.label, 'Key 1');
+      expect(await store.read(), 'legacy-secret');
+      expect(backend.values[SecureApiKeyStore.storageKey], isNull);
+    });
+
+    test('adds, renames, switches, and deletes key profiles', () async {
+      final store = SecureApiKeyStore(backend: _MemoryBackend());
+      await store.addProfile(
+        id: 'primary',
+        label: 'Primary',
+        key: 'primary-secret',
+      );
+      await store.addProfile(
+        id: 'backup',
+        label: 'Backup',
+        key: 'backup-secret',
+        activate: false,
+      );
+
+      await store.selectProfile('backup');
+      await store.renameProfile('backup', 'Spare');
+      final vault = await store.deleteProfile('backup');
+
+      expect(vault.profiles.map((profile) => profile.label), <String>[
+        'Primary',
+      ]);
+      expect(vault.activeProfileId, 'primary');
+      expect(await store.read(), 'primary-secret');
+    });
+
+    test('empty input removes every stored key profile', () async {
       final backend = _MemoryBackend();
       final store = SecureApiKeyStore(backend: backend);
       await store.write('sk-test-value');
@@ -41,12 +79,13 @@ void main() {
       await store.write('   ');
 
       expect(await store.read(), isNull);
+      expect((await store.readVault()).isEmpty, isTrue);
       expect(backend.values, isEmpty);
     });
 
-    test('blank persisted values are treated as missing', () async {
-      final backend = _MemoryBackend();
-      backend.values[SecureApiKeyStore.storageKey] = '   ';
+    test('blank persisted legacy values are treated as missing', () async {
+      final backend = _MemoryBackend()
+        ..values[SecureApiKeyStore.storageKey] = '   ';
 
       expect(await SecureApiKeyStore(backend: backend).read(), isNull);
     });

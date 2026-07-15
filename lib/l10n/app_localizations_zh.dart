@@ -5528,6 +5528,44 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsPageAdvancedFeatures => '高级功能';
+
+  @override
+  String get baiziKeyManagerTitle => 'Key 管理';
+
+  @override
+  String get baiziKeyManagerAdd => '添加 Key';
+
+  @override
+  String get baiziKeyManagerAddTitle => '添加 API Key';
+
+  @override
+  String get baiziKeyManagerRenameTitle => '重命名 Key';
+
+  @override
+  String get baiziKeyManagerNameLabel => '名称';
+
+  @override
+  String get baiziKeyManagerNoKeys => '暂无已保存的 API Key';
+
+  @override
+  String get baiziKeyManagerActive => '使用中';
+
+  @override
+  String get baiziKeyManagerDeleteTitle => '删除 API Key？';
+
+  @override
+  String baiziKeyManagerDeleteMessage(String name) {
+    return '要从本机删除“$name”吗？之后需要重新输入才能使用。';
+  }
+
+  @override
+  String get baiziKeyManagerSwitching => '正在切换 Key…';
+
+  @override
+  String get baiziKeyManagerRenameTooltip => '重命名 Key';
+
+  @override
+  String get baiziKeyManagerDeleteTooltip => '删除 Key';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -11054,6 +11092,44 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get settingsPageAdvancedFeatures => '高级功能';
+
+  @override
+  String get baiziKeyManagerTitle => 'Key 管理';
+
+  @override
+  String get baiziKeyManagerAdd => '添加 Key';
+
+  @override
+  String get baiziKeyManagerAddTitle => '添加 API Key';
+
+  @override
+  String get baiziKeyManagerRenameTitle => '重命名 Key';
+
+  @override
+  String get baiziKeyManagerNameLabel => '名称';
+
+  @override
+  String get baiziKeyManagerNoKeys => '暂无已保存的 API Key';
+
+  @override
+  String get baiziKeyManagerActive => '使用中';
+
+  @override
+  String get baiziKeyManagerDeleteTitle => '删除 API Key？';
+
+  @override
+  String baiziKeyManagerDeleteMessage(String name) {
+    return '要从本机删除“$name”吗？之后需要重新输入才能使用。';
+  }
+
+  @override
+  String get baiziKeyManagerSwitching => '正在切换 Key…';
+
+  @override
+  String get baiziKeyManagerRenameTooltip => '重命名 Key';
+
+  @override
+  String get baiziKeyManagerDeleteTooltip => '删除 Key';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -16580,4 +16656,42 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsPageAdvancedFeatures => '進階功能';
+
+  @override
+  String get baiziKeyManagerTitle => 'Key 管理';
+
+  @override
+  String get baiziKeyManagerAdd => '新增 Key';
+
+  @override
+  String get baiziKeyManagerAddTitle => '新增 API Key';
+
+  @override
+  String get baiziKeyManagerRenameTitle => '重新命名 Key';
+
+  @override
+  String get baiziKeyManagerNameLabel => '名稱';
+
+  @override
+  String get baiziKeyManagerNoKeys => '尚無已儲存的 API Key';
+
+  @override
+  String get baiziKeyManagerActive => '使用中';
+
+  @override
+  String get baiziKeyManagerDeleteTitle => '刪除 API Key？';
+
+  @override
+  String baiziKeyManagerDeleteMessage(String name) {
+    return '要從本機刪除「$name」嗎？之後需要重新輸入才能使用。';
+  }
+
+  @override
+  String get baiziKeyManagerSwitching => '正在切換 Key…';
+
+  @override
+  String get baiziKeyManagerRenameTooltip => '重新命名 Key';
+
+  @override
+  String get baiziKeyManagerDeleteTooltip => '刪除 Key';
 }

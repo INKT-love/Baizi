@@ -2042,5 +2042,24 @@
   "baiziModelNotSelected": "未選擇",
   "settingsPageApiKey": "API Key",
   "settingsPageCurrentModel": "目前模型",
-  "settingsPageAdvancedFeatures": "進階功能"
+  "settingsPageAdvancedFeatures": "進階功能",
+  "baiziKeyManagerTitle": "Key 管理",
+  "baiziKeyManagerAdd": "新增 Key",
+  "baiziKeyManagerAddTitle": "新增 API Key",
+  "baiziKeyManagerRenameTitle": "重新命名 Key",
+  "baiziKeyManagerNameLabel": "名稱",
+  "baiziKeyManagerNoKeys": "尚無已儲存的 API Key",
+  "baiziKeyManagerActive": "使用中",
+  "baiziKeyManagerDeleteTitle": "刪除 API Key？",
+  "baiziKeyManagerDeleteMessage": "要從本機刪除「{name}」嗎？之後需要重新輸入才能使用。",
+  "@baiziKeyManagerDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "baiziKeyManagerSwitching": "正在切換 Key…",
+  "baiziKeyManagerRenameTooltip": "重新命名 Key",
+  "baiziKeyManagerDeleteTooltip": "刪除 Key"
 }

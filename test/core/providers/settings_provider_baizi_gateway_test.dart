@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:Kelivo/core/config/baizi_gateway.dart';
 import 'package:Kelivo/core/providers/settings_provider.dart';
+import 'package:Kelivo/core/services/model_catalog_service.dart';
 import 'package:Kelivo/core/services/secure_api_key_store.dart';
 
 void main() {
@@ -41,7 +42,10 @@ void main() {
 
         await settings.initialization;
 
-        expect(backend.values[SecureApiKeyStore.storageKey], 'legacy-secret');
+        expect(
+          await SecureApiKeyStore(backend: backend).read(),
+          'legacy-secret',
+        );
         expect(settings.hasBaiziApiKey, isTrue);
         expect(settings.providerConfigs.keys, <String>[
           BaiziGateway.providerId,
@@ -161,7 +165,7 @@ void main() {
         throwsA(isA<Exception>()),
       );
 
-      expect(backend.values[SecureApiKeyStore.storageKey], 'working-key');
+      expect(await SecureApiKeyStore(backend: backend).read(), 'working-key');
       expect(settings.baiziProviderConfig.apiKey, 'working-key');
       expect(settings.baiziModels, <String>['gpt-old']);
       expect(settings.currentModelId, 'gpt-old');
@@ -196,7 +200,7 @@ void main() {
       await settings.setCurrentModel('ignored', 'gpt-5');
 
       expect(models, <String>['gpt-5', 'claude-sonnet-4-6']);
-      expect(backend.values[SecureApiKeyStore.storageKey], 'candidate-key');
+      expect(await SecureApiKeyStore(backend: backend).read(), 'candidate-key');
       expect(settings.recentBaiziModels, <String>[
         'gpt-5',
         'claude-sonnet-4-6',
@@ -211,6 +215,111 @@ void main() {
         isNot(contains('candidate-key')),
       );
     });
+
+    test('adds a validated key profile and makes it active', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final backend = _MemoryBackend();
+      final settings = SettingsProvider(
+        apiKeyStore: SecureApiKeyStore(backend: backend),
+      );
+      await settings.initialization;
+
+      await settings.configureBaiziApiKey(
+        'primary-key',
+        client: _modelsClientFor('primary-key', <String>['gpt-5']),
+      );
+      await settings.addBaiziApiKeyProfile(
+        '备用 Key',
+        'backup-key',
+        client: _modelsClientFor('backup-key', <String>['claude-sonnet-4-6']),
+      );
+
+      expect(
+        settings.baiziApiKeyProfiles.map((profile) => profile.label),
+        <String>['Key 1', '备用 Key'],
+      );
+      expect(settings.activeBaiziApiKeyProfileLabel, '备用 Key');
+      expect(settings.baiziModels, <String>['claude-sonnet-4-6']);
+      expect(await SecureApiKeyStore(backend: backend).read(), 'backup-key');
+    });
+
+    test(
+      'keeps the current key when switching to an invalid saved key',
+      () async {
+        SharedPreferences.setMockInitialValues(<String, Object>{});
+        final backend = _MemoryBackend();
+        final store = SecureApiKeyStore(backend: backend);
+        final settings = SettingsProvider(apiKeyStore: store);
+        await settings.initialization;
+
+        await settings.configureBaiziApiKey(
+          'working-key',
+          client: _modelsClientFor('working-key', <String>['gpt-5']),
+        );
+        final vault = await store.addProfile(
+          id: 'invalid-backup',
+          label: 'Invalid backup',
+          key: 'invalid-key',
+          activate: false,
+        );
+        expect(vault.activeProfile?.label, 'Key 1');
+
+        await expectLater(
+          settings.selectBaiziApiKeyProfile(
+            'invalid-backup',
+            client: MockClient((_) async => http.Response('', 401)),
+          ),
+          throwsA(isA<ModelCatalogException>()),
+        );
+
+        expect(settings.activeBaiziApiKeyProfileLabel, 'Key 1');
+        expect(settings.baiziModels, <String>['gpt-5']);
+        expect(await store.read(), 'working-key');
+      },
+    );
+
+    test('deleting the active key switches to another validated key', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final backend = _MemoryBackend();
+      final store = SecureApiKeyStore(backend: backend);
+      final settings = SettingsProvider(apiKeyStore: store);
+      await settings.initialization;
+
+      await settings.configureBaiziApiKey(
+        'primary-key',
+        client: _modelsClientFor('primary-key', <String>['gpt-5']),
+      );
+      await store.addProfile(
+        id: 'backup',
+        label: 'Backup',
+        key: 'backup-key',
+        activate: false,
+      );
+
+      final activeId = settings.activeBaiziApiKeyProfileId!;
+      await settings.deleteBaiziApiKeyProfile(
+        activeId,
+        client: _modelsClientFor('backup-key', <String>['claude-opus-4-1']),
+      );
+
+      expect(settings.baiziApiKeyProfiles, hasLength(1));
+      expect(settings.activeBaiziApiKeyProfileLabel, 'Backup');
+      expect(settings.baiziModels, <String>['claude-opus-4-1']);
+      expect(await store.read(), 'backup-key');
+    });
+  });
+}
+
+http.Client _modelsClientFor(String expectedKey, List<String> models) {
+  return MockClient((request) async {
+    expect(request.url, BaiziGateway.modelsUri);
+    expect(request.headers['Authorization'], 'Bearer $expectedKey');
+    return http.Response(
+      jsonEncode(<String, Object?>{
+        'data': models.map((model) => <String, String>{'id': model}).toList(),
+      }),
+      200,
+    );
   });
 }
 

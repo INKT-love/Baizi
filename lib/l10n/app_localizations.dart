@@ -10585,6 +10585,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Advanced'**
   String get settingsPageAdvancedFeatures;
+
+  /// No description provided for @baiziKeyManagerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Key management'**
+  String get baiziKeyManagerTitle;
+
+  /// No description provided for @baiziKeyManagerAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add key'**
+  String get baiziKeyManagerAdd;
+
+  /// No description provided for @baiziKeyManagerAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add API key'**
+  String get baiziKeyManagerAddTitle;
+
+  /// No description provided for @baiziKeyManagerRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename key'**
+  String get baiziKeyManagerRenameTitle;
+
+  /// No description provided for @baiziKeyManagerNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get baiziKeyManagerNameLabel;
+
+  /// No description provided for @baiziKeyManagerNoKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved API keys'**
+  String get baiziKeyManagerNoKeys;
+
+  /// No description provided for @baiziKeyManagerActive.
+  ///
+  /// In en, this message translates to:
+  /// **'In use'**
+  String get baiziKeyManagerActive;
+
+  /// No description provided for @baiziKeyManagerDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete API key?'**
+  String get baiziKeyManagerDeleteTitle;
+
+  /// No description provided for @baiziKeyManagerDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\" from this device? You will need to enter it again to use it.'**
+  String baiziKeyManagerDeleteMessage(String name);
+
+  /// No description provided for @baiziKeyManagerSwitching.
+  ///
+  /// In en, this message translates to:
+  /// **'Switching key...'**
+  String get baiziKeyManagerSwitching;
+
+  /// No description provided for @baiziKeyManagerRenameTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename key'**
+  String get baiziKeyManagerRenameTooltip;
+
+  /// No description provided for @baiziKeyManagerDeleteTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete key'**
+  String get baiziKeyManagerDeleteTooltip;
 }
 
 class _AppLocalizationsDelegate

@@ -5,11 +5,11 @@ abstract final class BaiziBrand {
   static const String? releaseManifestUrl = null;
   static const String? websiteUrl = null;
 
-  static const String upstreamName = 'Kelivo';
+  static const String upstreamName = 'Baizi';
   static const String upstreamRepositoryUrl =
-      'https://github.com/Chevey339/kelivo';
+      'https://github.com/INKT-love/Baizi';
   static const String licenseName = 'AGPL-3.0';
-  static const String licenseUrl = '$upstreamRepositoryUrl/blob/master/LICENSE';
+  static const String licenseUrl = '$upstreamRepositoryUrl/blob/main/LICENSE';
 
   static bool isKelivoReleaseUri(Uri uri) {
     final host = uri.host.toLowerCase();

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/config/baizi_gateway.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/services/model_catalog_service.dart';
 import '../../../icons/lucide_adapter.dart';
@@ -60,6 +62,13 @@ class _BaiziSetupPageState extends State<BaiziSetupPage> {
       _catalogError = null;
       _storageError = false;
     });
+  }
+
+  Future<void> _openKeyPortal() async {
+    final uri = BaiziGateway.keyPortalUri;
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      await launchUrl(uri, mode: LaunchMode.platformDefault);
+    }
   }
 
   Future<void> _configureKey() async {
@@ -263,6 +272,14 @@ class _BaiziSetupPageState extends State<BaiziSetupPage> {
                   onTap: _submitting || _keyController.text.trim().isEmpty
                       ? null
                       : _configureKey,
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.center,
+                  child: TextButton(
+                    onPressed: _openKeyPortal,
+                    child: Text(l10n.baiziGetApiKey),
+                  ),
                 ),
               ],
             ),

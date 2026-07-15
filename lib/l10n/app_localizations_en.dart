@@ -5675,6 +5675,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get baiziVerifyKey => 'Verify and load models';
 
   @override
+  String get baiziGetApiKey => 'No API Key? Get one';
+
+  @override
   String get baiziVerifyingKey => 'Verifying';
 
   @override

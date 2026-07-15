@@ -29,6 +29,7 @@ void main() {
     expect(find.text('连接白子'), findsOneWidget);
     expect(find.text('API Key'), findsOneWidget);
     expect(find.text('验证并获取模型'), findsOneWidget);
+    expect(find.text('没有API Key？ 点击获取'), findsOneWidget);
     expect(find.text('HOME'), findsNothing);
     expect(find.textContaining('Base URL'), findsNothing);
     expect(find.text('供应商'), findsNothing);

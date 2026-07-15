@@ -10418,6 +10418,12 @@ abstract class AppLocalizations {
   /// **'Verify and load models'**
   String get baiziVerifyKey;
 
+  /// No description provided for @baiziGetApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'No API Key? Get one'**
+  String get baiziGetApiKey;
+
   /// No description provided for @baiziVerifyingKey.
   ///
   /// In en, this message translates to:

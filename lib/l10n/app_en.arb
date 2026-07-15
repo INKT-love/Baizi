@@ -2438,6 +2438,7 @@
   "baiziHideKeyTooltip": "Hide key",
   "baiziSetupClearTooltip": "Clear",
   "baiziVerifyKey": "Verify and load models",
+  "baiziGetApiKey": "No API Key? Get one",
   "baiziVerifyingKey": "Verifying",
   "baiziChooseModelTitle": "Choose a model",
   "baiziRefreshModels": "Refresh models",

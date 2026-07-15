@@ -10,6 +10,10 @@ void main() {
         BaiziGateway.modelsUri.toString(),
         'https://api.inktandwkx.top:51000/v1/models',
       );
+      expect(
+        BaiziGateway.keyPortalUri.toString(),
+        'https://api.inktandwkx.top:51000/keys',
+      );
     });
 
     test('routes every Claude alias to Anthropic', () {

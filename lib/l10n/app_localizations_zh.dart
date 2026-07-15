@@ -5446,6 +5446,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get baiziVerifyKey => '验证并获取模型';
 
   @override
+  String get baiziGetApiKey => '没有API Key？ 点击获取';
+
+  @override
   String get baiziVerifyingKey => '正在验证';
 
   @override
@@ -11010,6 +11013,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get baiziVerifyKey => '验证并获取模型';
 
   @override
+  String get baiziGetApiKey => '没有API Key？ 点击获取';
+
+  @override
   String get baiziVerifyingKey => '正在验证';
 
   @override
@@ -16572,6 +16578,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get baiziVerifyKey => '驗證並取得模型';
+
+  @override
+  String get baiziGetApiKey => '沒有 API Key？點擊取得';
 
   @override
   String get baiziVerifyingKey => '正在驗證';

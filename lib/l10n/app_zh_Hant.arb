@@ -2015,6 +2015,7 @@
   "baiziHideKeyTooltip": "隱藏 Key",
   "baiziSetupClearTooltip": "清空",
   "baiziVerifyKey": "驗證並取得模型",
+  "baiziGetApiKey": "沒有 API Key？點擊取得",
   "baiziVerifyingKey": "正在驗證",
   "baiziChooseModelTitle": "選擇模型",
   "baiziRefreshModels": "重新整理模型",

@@ -15,6 +15,7 @@ final class BaiziGatewayException implements Exception {
 abstract final class BaiziGateway {
   static const String providerId = 'baizi';
   static const String baseUrl = 'https://api.inktandwkx.top:51000/v1';
+  static const String keyPortalUrl = 'https://api.inktandwkx.top:51000/keys';
 
   static const Set<String> _protectedHeaders = <String>{
     'authorization',
@@ -54,6 +55,7 @@ abstract final class BaiziGateway {
   };
 
   static Uri get modelsUri => Uri.parse('$baseUrl/models');
+  static Uri get keyPortalUri => Uri.parse(keyPortalUrl);
 
   static String _normalizeFieldName(String value) =>
       value.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');

@@ -86,6 +86,14 @@ class UpdateInfo {
       downloads: downloads,
     );
   }
+
+  factory UpdateInfo.fromGitHubReleasePageUri(Uri releasePageUri) {
+    return UpdateInfo(
+      app: BaiziBrand.updateManifestAppId,
+      version: releasePageUri.pathSegments.lastOrNull ?? '',
+      downloads: <String, String>{'universal': releasePageUri.toString()},
+    );
+  }
 }
 
 class UpdateProvider extends ChangeNotifier {
@@ -136,6 +144,28 @@ class UpdateProvider extends ChangeNotifier {
       if (BaiziBrand.isKelivoReleaseUri(source)) {
         throw StateError('Kelivo release manifests are not valid for Baizi');
       }
+      if (_isGitHubLatestReleaseUri(source)) {
+        final request = http.Request('GET', source)
+          ..followRedirects = false
+          ..maxRedirects = 0;
+        final response = await http.Response.fromStream(
+          await _client.send(request),
+        );
+        if (response.statusCode < 300 || response.statusCode >= 400) {
+          throw Exception('HTTP ${response.statusCode}');
+        }
+        final location = response.headers['location'];
+        if (location == null || location.isEmpty) {
+          throw const FormatException('GitHub release location is missing');
+        }
+        final info = UpdateInfo.fromGitHubReleasePageUri(
+          source.resolve(location),
+        );
+        _validateManifest(info);
+        await _finishCheck(info);
+        return;
+      }
+
       final url = source.replace(
         queryParameters: <String, String>{
           ...source.queryParameters,
@@ -150,18 +180,7 @@ class UpdateProvider extends ChangeNotifier {
           jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
       final info = UpdateInfo.fromJson(data);
       _validateManifest(info);
-
-      final currentVer = await _currentVersionLoader();
-
-      // Compare by version only; ignore build numbers
-      final hasNew = _isRemoteNewer(
-        remoteVersion: info.version,
-        currentVersion: currentVer,
-      );
-      _available = hasNew ? info : null;
-      _status = hasNew
-          ? UpdateCheckStatus.updateAvailable
-          : UpdateCheckStatus.upToDate;
+      await _finishCheck(info);
     } catch (e) {
       _error = e.toString();
       _status = UpdateCheckStatus.failed;
@@ -171,13 +190,28 @@ class UpdateProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> _finishCheck(UpdateInfo info) async {
+    final currentVer = await _currentVersionLoader();
+
+    // Compare by version only; ignore build numbers
+    final hasNew = _isRemoteNewer(
+      remoteVersion: info.version,
+      currentVersion: currentVer,
+    );
+    _available = hasNew ? info : null;
+    _status = hasNew
+        ? UpdateCheckStatus.updateAvailable
+        : UpdateCheckStatus.upToDate;
+  }
+
   bool _isRemoteNewer({
     required String remoteVersion,
     required String currentVersion,
   }) {
     // Compare semantic versions only (ignore internal build numbers)
     List<int> parseVer(String v) {
-      final parts = v.split('.');
+      final normalized = v.trim().replaceFirst(RegExp(r'^[vV]'), '');
+      final parts = normalized.split('.');
       final nums = <int>[];
       for (int i = 0; i < 3; i++) {
         nums.add(i < parts.length ? int.tryParse(parts[i]) ?? 0 : 0);
@@ -196,6 +230,11 @@ class UpdateProvider extends ChangeNotifier {
   static Uri? _parseManifestUri(String? rawUrl) {
     final trimmed = rawUrl?.trim() ?? '';
     return trimmed.isEmpty ? null : Uri.parse(trimmed);
+  }
+
+  static bool _isGitHubLatestReleaseUri(Uri uri) {
+    return uri.host.toLowerCase() == 'github.com' &&
+        uri.path.toLowerCase() == '/inkt-love/baizi/releases/latest';
   }
 
   static Future<String> _loadCurrentVersionFromPlatform() async {

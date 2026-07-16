@@ -1106,6 +1106,21 @@
       }
     }
   },
+  "appUpdateChecking": "Checking for updates",
+  "appUpdateCheckNow": "Check for updates",
+  "appUpdateAvailable": "Update available",
+  "appUpdateUpToDate": "Up to date",
+  "appUpdateUnableToCheck": "Unable to check",
+  "appUpdateLater": "Later",
+  "appUpdateUpgradeNow": "Upgrade now",
+  "appUpdateDialogBody": "Version {version} is available. The download page is on GitHub; use a network proxy if GitHub cannot be opened.",
+  "@appUpdateDialogBody": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "sideDrawerLinkCopied": "Link copied",
   "sideDrawerPinnedLabel": "Pinned",
   "sideDrawerHistory": "History",

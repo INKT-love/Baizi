@@ -14,6 +14,7 @@ void main() {
         var requestCount = 0;
         var versionLoadCount = 0;
         final provider = UpdateProvider(
+          releaseManifestUrl: null,
           client: MockClient((_) async {
             requestCount++;
             return http.Response('{}', 200);
@@ -34,6 +35,62 @@ void main() {
         expect(provider.status, UpdateCheckStatus.disabled);
         expect(provider.available, isNull);
         expect(provider.error, isNull);
+      },
+    );
+
+    test(
+      'reads the official GitHub release redirect and opens its release page',
+      () async {
+        Uri? requestedUri;
+        final provider = UpdateProvider(
+          client: MockClient((request) async {
+            requestedUri = request.url;
+            return http.Response(
+              '',
+              302,
+              headers: {
+                'location':
+                    'https://github.com/INKT-love/Baizi/releases/tag/v1.2.0',
+              },
+            );
+          }),
+          currentVersionLoader: () async => '1.1.24',
+        );
+
+        await provider.checkForUpdates();
+
+        expect(requestedUri?.host, 'github.com');
+        expect(requestedUri?.path, '/INKT-love/Baizi/releases/latest');
+        expect(provider.status, UpdateCheckStatus.updateAvailable);
+        expect(provider.available?.version, 'v1.2.0');
+        expect(
+          provider.available?.bestDownloadUrl(),
+          'https://github.com/INKT-love/Baizi/releases/tag/v1.2.0',
+        );
+      },
+    );
+
+    test(
+      'accepts a leading v when comparing GitHub release versions',
+      () async {
+        final provider = UpdateProvider(
+          client: MockClient(
+            (_) async => http.Response(
+              '',
+              302,
+              headers: {
+                'location':
+                    'https://github.com/INKT-love/Baizi/releases/tag/v1.1.24',
+              },
+            ),
+          ),
+          currentVersionLoader: () async => '1.1.24',
+        );
+
+        await provider.checkForUpdates();
+
+        expect(provider.status, UpdateCheckStatus.upToDate);
+        expect(provider.available, isNull);
       },
     );
 

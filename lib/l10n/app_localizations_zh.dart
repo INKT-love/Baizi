@@ -2439,6 +2439,32 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get appUpdateChecking => '正在检查更新';
+
+  @override
+  String get appUpdateCheckNow => '检查更新';
+
+  @override
+  String get appUpdateAvailable => '有新版本可用';
+
+  @override
+  String get appUpdateUpToDate => '已为最新版';
+
+  @override
+  String get appUpdateUnableToCheck => '暂时无法检查更新';
+
+  @override
+  String get appUpdateLater => '稍后';
+
+  @override
+  String get appUpdateUpgradeNow => '立即升级';
+
+  @override
+  String appUpdateDialogBody(String version) {
+    return '版本 $version 已发布。下载页位于 GitHub，如无法打开 GitHub，请使用网络代理。';
+  }
+
+  @override
   String get sideDrawerLinkCopied => '已复制下载链接';
 
   @override
@@ -8006,6 +8032,32 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get appUpdateChecking => '正在检查更新';
+
+  @override
+  String get appUpdateCheckNow => '检查更新';
+
+  @override
+  String get appUpdateAvailable => '有新版本可用';
+
+  @override
+  String get appUpdateUpToDate => '已为最新版';
+
+  @override
+  String get appUpdateUnableToCheck => '暂时无法检查更新';
+
+  @override
+  String get appUpdateLater => '稍后';
+
+  @override
+  String get appUpdateUpgradeNow => '立即升级';
+
+  @override
+  String appUpdateDialogBody(String version) {
+    return '版本 $version 已发布。下载页位于 GitHub，如无法打开 GitHub，请使用网络代理。';
+  }
+
+  @override
   String get sideDrawerLinkCopied => '已复制下载链接';
 
   @override
@@ -13569,6 +13621,32 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String sideDrawerUpdateTitleWithBuild(String version, int build) {
     return '發現新版本：$version ($build)';
+  }
+
+  @override
+  String get appUpdateChecking => '正在檢查更新';
+
+  @override
+  String get appUpdateCheckNow => '檢查更新';
+
+  @override
+  String get appUpdateAvailable => '有新版本可用';
+
+  @override
+  String get appUpdateUpToDate => '已為最新版本';
+
+  @override
+  String get appUpdateUnableToCheck => '暫時無法檢查更新';
+
+  @override
+  String get appUpdateLater => '稍後';
+
+  @override
+  String get appUpdateUpgradeNow => '立即升級';
+
+  @override
+  String appUpdateDialogBody(String version) {
+    return '版本 $version 已發佈。下載頁位於 GitHub，如無法開啟 GitHub，請使用網路代理。';
   }
 
   @override

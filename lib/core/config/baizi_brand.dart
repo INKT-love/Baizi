@@ -1,8 +1,8 @@
 abstract final class BaiziBrand {
   static const String updateManifestAppId = 'baizi';
 
-  // A dedicated Baizi release manifest has not been published yet.
-  static const String? releaseManifestUrl = null;
+  static const String releaseManifestUrl =
+      'https://github.com/INKT-love/Baizi/releases/latest';
   static const String? websiteUrl = null;
 
   static const String upstreamName = 'Baizi';

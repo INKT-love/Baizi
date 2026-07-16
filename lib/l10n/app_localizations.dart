@@ -4739,6 +4739,54 @@ abstract class AppLocalizations {
   /// **'New version: {version} ({build})'**
   String sideDrawerUpdateTitleWithBuild(String version, int build);
 
+  /// No description provided for @appUpdateChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates'**
+  String get appUpdateChecking;
+
+  /// No description provided for @appUpdateCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates'**
+  String get appUpdateCheckNow;
+
+  /// No description provided for @appUpdateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Update available'**
+  String get appUpdateAvailable;
+
+  /// No description provided for @appUpdateUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to date'**
+  String get appUpdateUpToDate;
+
+  /// No description provided for @appUpdateUnableToCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to check'**
+  String get appUpdateUnableToCheck;
+
+  /// No description provided for @appUpdateLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get appUpdateLater;
+
+  /// No description provided for @appUpdateUpgradeNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade now'**
+  String get appUpdateUpgradeNow;
+
+  /// No description provided for @appUpdateDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is available. The download page is on GitHub; use a network proxy if GitHub cannot be opened.'**
+  String appUpdateDialogBody(String version);
+
   /// No description provided for @sideDrawerLinkCopied.
   ///
   /// In en, this message translates to:

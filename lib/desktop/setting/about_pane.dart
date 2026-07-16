@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/baizi_brand.dart';
+import '../../core/providers/settings_provider.dart';
 import '../../core/providers/update_provider.dart';
 import '../../icons/lucide_adapter.dart' as lucide;
 import '../../l10n/app_localizations.dart';
@@ -81,7 +82,17 @@ class _DesktopAboutPaneState extends State<DesktopAboutPane> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
-    final updatesEnabled = context.watch<UpdateProvider>().isEnabled;
+    final settings = context.watch<SettingsProvider>();
+    final update = context.watch<UpdateProvider>();
+    final updateStatus = !settings.showAppUpdates
+        ? l10n.mcpPageStatusDisabled
+        : switch (update.status) {
+            UpdateCheckStatus.checking => l10n.appUpdateChecking,
+            UpdateCheckStatus.updateAvailable => l10n.appUpdateAvailable,
+            UpdateCheckStatus.upToDate => l10n.appUpdateUpToDate,
+            UpdateCheckStatus.failed => l10n.appUpdateUnableToCheck,
+            _ => l10n.appUpdateCheckNow,
+          };
 
     String localizeSystem(String systemId) {
       switch (systemId) {
@@ -166,14 +177,14 @@ class _DesktopAboutPaneState extends State<DesktopAboutPane> {
                     label: l10n.aboutPageSystem,
                     detail: systemDetail,
                   ),
-                  if (!updatesEnabled) ...[
-                    const _DeskRowDivider(),
-                    _DeskInfoRow(
-                      icon: lucide.Lucide.RefreshCw,
-                      label: l10n.displaySettingsPageShowUpdatesTitle,
-                      detail: l10n.mcpPageStatusDisabled,
-                    ),
-                  ],
+                  const _DeskRowDivider(),
+                  _DeskNavRow(
+                    icon: lucide.Lucide.RefreshCw,
+                    label: l10n.displaySettingsPageShowUpdatesTitle,
+                    detail: updateStatus,
+                    onTap: () =>
+                        context.read<UpdateProvider>().checkForUpdates(),
+                  ),
                   const _DeskRowDivider(),
                   _DeskNavRowSvg(
                     svgAsset: 'assets/icons/github.svg',

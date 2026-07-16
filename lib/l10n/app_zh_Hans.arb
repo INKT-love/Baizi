@@ -883,6 +883,21 @@
   },
   "sideDrawerUpdateTitle": "发现新版本：{version}",
   "sideDrawerUpdateTitleWithBuild": "发现新版本：{version} ({build})",
+  "appUpdateChecking": "正在检查更新",
+  "appUpdateCheckNow": "检查更新",
+  "appUpdateAvailable": "有新版本可用",
+  "appUpdateUpToDate": "已为最新版",
+  "appUpdateUnableToCheck": "暂时无法检查更新",
+  "appUpdateLater": "稍后",
+  "appUpdateUpgradeNow": "立即升级",
+  "appUpdateDialogBody": "版本 {version} 已发布。下载页位于 GitHub，如无法打开 GitHub，请使用网络代理。",
+  "@appUpdateDialogBody": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "sideDrawerLinkCopied": "已复制下载链接",
   "sideDrawerPinnedLabel": "置顶",
   "sideDrawerHistory": "聊天历史",

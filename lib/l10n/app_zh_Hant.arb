@@ -841,6 +841,21 @@
   },
   "sideDrawerUpdateTitle": "發現新版本：{version}",
   "sideDrawerUpdateTitleWithBuild": "發現新版本：{version} ({build})",
+  "appUpdateChecking": "正在檢查更新",
+  "appUpdateCheckNow": "檢查更新",
+  "appUpdateAvailable": "有新版本可用",
+  "appUpdateUpToDate": "已為最新版本",
+  "appUpdateUnableToCheck": "暫時無法檢查更新",
+  "appUpdateLater": "稍後",
+  "appUpdateUpgradeNow": "立即升級",
+  "appUpdateDialogBody": "版本 {version} 已發佈。下載頁位於 GitHub，如無法開啟 GitHub，請使用網路代理。",
+  "@appUpdateDialogBody": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "sideDrawerLinkCopied": "已複製下載連結",
   "sideDrawerPinnedLabel": "置頂",
   "sideDrawerHistory": "聊天歷史",

@@ -295,7 +295,18 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
-    final updatesEnabled = context.watch<UpdateProvider>().isEnabled;
+    final settings = context.watch<SettingsProvider>();
+    final update = context.watch<UpdateProvider>();
+
+    final updateStatus = !settings.showAppUpdates
+        ? l10n.mcpPageStatusDisabled
+        : switch (update.status) {
+            UpdateCheckStatus.checking => l10n.appUpdateChecking,
+            UpdateCheckStatus.updateAvailable => l10n.appUpdateAvailable,
+            UpdateCheckStatus.upToDate => l10n.appUpdateUpToDate,
+            UpdateCheckStatus.failed => l10n.appUpdateUnableToCheck,
+            _ => l10n.appUpdateCheckNow,
+          };
 
     return Scaffold(
       appBar: AppBar(
@@ -397,15 +408,14 @@ class _AboutPageState extends State<AboutPage> {
                     Text(_systemInfo.isEmpty ? '...' : _systemInfo),
                 onTap: null, // informational only
               ),
-              if (!updatesEnabled) ...[
-                _iosDivider(context),
-                _iosNavRow(
-                  context,
-                  icon: Lucide.RefreshCw,
-                  label: l10n.displaySettingsPageShowUpdatesTitle,
-                  detailText: l10n.mcpPageStatusDisabled,
-                ),
-              ],
+              _iosDivider(context),
+              _iosNavRow(
+                context,
+                icon: Lucide.RefreshCw,
+                label: l10n.displaySettingsPageShowUpdatesTitle,
+                detailText: updateStatus,
+                onTap: () => context.read<UpdateProvider>().checkForUpdates(),
+              ),
               _iosDivider(context),
               _iosNavRowSvgLeading(
                 context,

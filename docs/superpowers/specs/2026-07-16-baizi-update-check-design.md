@@ -8,14 +8,18 @@ offers an optional upgrade prompt from the home screen.
 
 ## Update Source
 
-The source is GitHub's latest-release endpoint:
+The source is GitHub's latest-release page:
 
-`https://api.github.com/repos/INKT-love/Baizi/releases/latest`
+`https://github.com/INKT-love/Baizi/releases/latest`
 
 Only stable releases are considered. GitHub pre-releases and drafts are not
 offered to ordinary users. The release page, rather than one architecture-
 specific APK asset, is opened for upgrades so users can select the APK that
 matches their device.
+
+The page's redirect is used instead of GitHub's anonymous REST API because a
+shared network address can exhaust that API's rate limit. This keeps version
+checks available without requiring an account or bundled access token.
 
 The provider retains support for the existing Baizi manifest shape. It also
 recognizes GitHub's release JSON and normalizes it into `UpdateInfo`. This

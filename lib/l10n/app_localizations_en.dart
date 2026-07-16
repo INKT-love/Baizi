@@ -2539,6 +2539,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get appUpdateChecking => 'Checking for updates';
+
+  @override
+  String get appUpdateCheckNow => 'Check for updates';
+
+  @override
+  String get appUpdateAvailable => 'Update available';
+
+  @override
+  String get appUpdateUpToDate => 'Up to date';
+
+  @override
+  String get appUpdateUnableToCheck => 'Unable to check';
+
+  @override
+  String get appUpdateLater => 'Later';
+
+  @override
+  String get appUpdateUpgradeNow => 'Upgrade now';
+
+  @override
+  String appUpdateDialogBody(String version) {
+    return 'Version $version is available. The download page is on GitHub; use a network proxy if GitHub cannot be opened.';
+  }
+
+  @override
   String get sideDrawerLinkCopied => 'Link copied';
 
   @override

@@ -47,6 +47,7 @@ import 'dart:io'
 import 'core/services/android_background.dart';
 import 'core/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final RouteObserver<ModalRoute<dynamic>> routeObserver =
     RouteObserver<ModalRoute<dynamic>>();
@@ -207,7 +208,9 @@ class MyApp extends StatelessWidget {
             } catch (_) {}
           });
           // One-time app update check after first build
-          if (settings.showAppUpdates && !_didCheckUpdates) {
+          if (settings.isLoaded &&
+              settings.showAppUpdates &&
+              !_didCheckUpdates) {
             _didCheckUpdates = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               try {
@@ -436,8 +439,8 @@ class MyApp extends StatelessWidget {
                   }
 
                   // Enforce app font as a default across the tree for Texts without explicit family
-                  final appWithOverlays = AppOverlays(
-                    child: child ?? const SizedBox.shrink(),
+                  final appWithOverlays = _UpdatePromptController(
+                    child: AppOverlays(child: child ?? const SizedBox.shrink()),
                   );
                   return AnnotatedRegion<SystemUiOverlayStyle>(
                     value: overlay,
@@ -453,6 +456,66 @@ class MyApp extends StatelessWidget {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class _UpdatePromptController extends StatefulWidget {
+  const _UpdatePromptController({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_UpdatePromptController> createState() =>
+      _UpdatePromptControllerState();
+}
+
+class _UpdatePromptControllerState extends State<_UpdatePromptController> {
+  bool _didShowUpdatePrompt = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
+    final update = context.watch<UpdateProvider>();
+    final info = update.available;
+    if (settings.showAppUpdates &&
+        update.status == UpdateCheckStatus.updateAvailable &&
+        info != null &&
+        !_didShowUpdatePrompt) {
+      _didShowUpdatePrompt = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showUpdatePrompt(info);
+      });
+    }
+    return widget.child;
+  }
+
+  Future<void> _showUpdatePrompt(UpdateInfo info) async {
+    final url = info.bestDownloadUrl();
+    if (url == null || url.isEmpty) return;
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.appUpdateAvailable),
+        content: Text(l10n.appUpdateDialogBody(info.version)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.appUpdateLater),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              await launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              );
+            },
+            child: Text(l10n.appUpdateUpgradeNow),
+          ),
+        ],
       ),
     );
   }

@@ -35,7 +35,7 @@ void main() {
       }
     });
 
-    test('routes all non-Claude models to Chat Completions', () {
+    test('routes all non-Claude models to Responses API', () {
       for (final modelId in <String>[
         'gpt-5',
         'deepseek-chat',
@@ -50,7 +50,7 @@ void main() {
         );
         expect(
           BaiziGateway.chatUriForModel(modelId).path,
-          '/v1/chat/completions',
+          '/v1/responses',
           reason: modelId,
         );
       }

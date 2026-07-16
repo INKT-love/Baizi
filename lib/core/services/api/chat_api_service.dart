@@ -191,13 +191,14 @@ class ChatApiService {
   static ProviderConfig _runtimeConfig(ProviderConfig config, String modelId) {
     if (!_isBaiziConfig(config)) return config;
     final protocol = BaiziGateway.protocolForModel(modelId);
+    final useResponsesApi = protocol == BaiziApiProtocol.openAi;
     return config.copyWith(
       baseUrl: BaiziGateway.baseUrl,
       providerType: protocol == BaiziApiProtocol.anthropic
           ? ProviderKind.claude
           : ProviderKind.openai,
-      chatPath: '/chat/completions',
-      useResponseApi: false,
+      chatPath: useResponsesApi ? '/responses' : '/messages',
+      useResponseApi: useResponsesApi,
       vertexAI: false,
       multiKeyEnabled: false,
       apiKeys: const [],

@@ -105,7 +105,7 @@ abstract final class BaiziGateway {
 
   static Uri chatUriForModel(String modelId) {
     final path = switch (protocolForModel(modelId)) {
-      BaiziApiProtocol.openAi => '/chat/completions',
+      BaiziApiProtocol.openAi => '/responses',
       BaiziApiProtocol.anthropic => '/messages',
     };
     return Uri.parse('$baseUrl$path');

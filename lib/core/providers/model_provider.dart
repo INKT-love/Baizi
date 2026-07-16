@@ -383,14 +383,22 @@ class BaiziProvider extends BaseProvider {
     );
 
     final protocol = BaiziGateway.protocolForModel(normalizedModelId);
-    final body = <String, dynamic>{
-      'model': normalizedModelId,
-      'messages': const <Map<String, String>>[
-        <String, String>{'role': 'user', 'content': 'hello'},
-      ],
-      'stream': true,
-      if (protocol == BaiziApiProtocol.anthropic) 'max_tokens': 8,
-    };
+    final body = protocol == BaiziApiProtocol.openAi
+        ? <String, dynamic>{
+            'model': normalizedModelId,
+            'input': const <Map<String, String>>[
+              <String, String>{'role': 'user', 'content': 'hello'},
+            ],
+            'stream': true,
+          }
+        : <String, dynamic>{
+            'model': normalizedModelId,
+            'messages': const <Map<String, String>>[
+              <String, String>{'role': 'user', 'content': 'hello'},
+            ],
+            'stream': true,
+            'max_tokens': 8,
+          };
     final headers = protocol == BaiziApiProtocol.anthropic
         ? <String, String>{
             'x-api-key': cfg.apiKey.trim(),

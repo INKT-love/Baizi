@@ -2561,7 +2561,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String appUpdateDialogBody(String version) {
-    return 'Version $version is available. The download page is on GitHub; use a network proxy if GitHub cannot be opened.';
+    return 'Version $version is available. Baizi will open the mirror download first; if it falls back to GitHub and cannot be opened, use a network proxy.';
   }
 
   @override

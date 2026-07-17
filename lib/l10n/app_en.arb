@@ -1113,7 +1113,7 @@
   "appUpdateUnableToCheck": "Unable to check",
   "appUpdateLater": "Later",
   "appUpdateUpgradeNow": "Upgrade now",
-  "appUpdateDialogBody": "Version {version} is available. The download page is on GitHub; use a network proxy if GitHub cannot be opened.",
+  "appUpdateDialogBody": "Version {version} is available. Baizi will open the mirror download first; if it falls back to GitHub and cannot be opened, use a network proxy.",
   "@appUpdateDialogBody": {
     "placeholders": {
       "version": {

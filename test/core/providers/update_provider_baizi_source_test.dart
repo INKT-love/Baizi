@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+import 'package:Kelivo/core/config/baizi_brand.dart';
 import 'package:Kelivo/core/providers/update_provider.dart';
 
 void main() {
@@ -43,6 +44,7 @@ void main() {
       () async {
         Uri? requestedUri;
         final provider = UpdateProvider(
+          releaseManifestUrl: BaiziBrand.githubLatestReleaseUrl,
           client: MockClient((request) async {
             requestedUri = request.url;
             return http.Response(
@@ -70,10 +72,116 @@ void main() {
       },
     );
 
+    test('checks the OpenList mirror manifest before GitHub', () async {
+      final requested = <String>[];
+      final provider = UpdateProvider(
+        client: MockClient((request) async {
+          requested.add('${request.method} ${request.url}');
+          if (request.method == 'POST' &&
+              request.url.toString() ==
+                  'https://list.inktandwkx.top:50000/api/fs/get') {
+            expect(
+              jsonDecode(request.body) as Map<String, dynamic>,
+              containsPair('path', '/Baizi/manifest.json'),
+            );
+            return http.Response(
+              jsonEncode({
+                'code': 200,
+                'message': 'success',
+                'data': {
+                  'raw_url':
+                      'https://list.inktandwkx.top/d/Baizi/manifest.json?sign=abc',
+                },
+              }),
+              200,
+            );
+          }
+          if (request.method == 'GET' &&
+              request.url.path == '/d/Baizi/manifest.json') {
+            expect(request.url.port, 50000);
+            return http.Response(
+              jsonEncode({
+                'app': 'baizi',
+                'latest': {
+                  'version': '1.2.0',
+                  'downloads': {
+                    'androidArm64': 'Baizi-v1.2.0-arm64-v8a.apk',
+                    'universal':
+                        'https://list.inktandwkx.top:50000/server/files/Baizi',
+                  },
+                },
+              }),
+              200,
+            );
+          }
+          fail('Unexpected request: ${request.method} ${request.url}');
+        }),
+        currentVersionLoader: () async => '1.1.24',
+      );
+
+      await provider.checkForUpdates();
+
+      expect(provider.status, UpdateCheckStatus.updateAvailable);
+      expect(provider.available?.version, '1.2.0');
+      expect(
+        provider.available?.downloads['androidArm64'],
+        'https://list.inktandwkx.top:50000/d/Baizi/Baizi-v1.2.0-arm64-v8a.apk',
+      );
+      expect(requested, hasLength(2));
+      expect(requested.first, startsWith('POST https://list.inktandwkx.top'));
+    });
+
+    test(
+      'falls back to GitHub when the OpenList manifest is unavailable',
+      () async {
+        final requested = <Uri>[];
+        final provider = UpdateProvider(
+          client: MockClient((request) async {
+            requested.add(request.url);
+            if (request.url.host == 'list.inktandwkx.top') {
+              return http.Response(
+                jsonEncode({
+                  'code': 500,
+                  'message': 'failed to get obj: object not found',
+                  'data': null,
+                }),
+                200,
+              );
+            }
+            if (request.url.host == 'github.com') {
+              return http.Response(
+                '',
+                302,
+                headers: {
+                  'location':
+                      'https://github.com/INKT-love/Baizi/releases/tag/v1.2.0',
+                },
+              );
+            }
+            fail('Unexpected request: ${request.url}');
+          }),
+          currentVersionLoader: () async => '1.1.24',
+        );
+
+        await provider.checkForUpdates();
+
+        expect(requested.map((uri) => uri.host), [
+          'list.inktandwkx.top',
+          'github.com',
+        ]);
+        expect(provider.status, UpdateCheckStatus.updateAvailable);
+        expect(
+          provider.available?.bestDownloadUrl(),
+          'https://github.com/INKT-love/Baizi/releases/tag/v1.2.0',
+        );
+      },
+    );
+
     test(
       'accepts a leading v when comparing GitHub release versions',
       () async {
         final provider = UpdateProvider(
+          releaseManifestUrl: BaiziBrand.githubLatestReleaseUrl,
           client: MockClient(
             (_) async => http.Response(
               '',

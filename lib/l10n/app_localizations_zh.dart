@@ -2461,7 +2461,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String appUpdateDialogBody(String version) {
-    return '版本 $version 已发布。下载页位于 GitHub，如无法打开 GitHub，请使用网络代理。';
+    return '版本 $version 已发布。白子会优先打开镜像下载；如果备用 GitHub 无法打开，请使用网络代理。';
   }
 
   @override
@@ -8054,7 +8054,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String appUpdateDialogBody(String version) {
-    return '版本 $version 已发布。下载页位于 GitHub，如无法打开 GitHub，请使用网络代理。';
+    return '版本 $version 已发布。白子会优先打开镜像下载；如果备用 GitHub 无法打开，请使用网络代理。';
   }
 
   @override
@@ -13646,7 +13646,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String appUpdateDialogBody(String version) {
-    return '版本 $version 已發佈。下載頁位於 GitHub，如無法開啟 GitHub，請使用網路代理。';
+    return '版本 $version 已發佈。白子會優先開啟鏡像下載；如果備用 GitHub 無法開啟，請使用網路代理。';
   }
 
   @override

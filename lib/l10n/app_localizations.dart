@@ -4784,7 +4784,7 @@ abstract class AppLocalizations {
   /// No description provided for @appUpdateDialogBody.
   ///
   /// In en, this message translates to:
-  /// **'Version {version} is available. The download page is on GitHub; use a network proxy if GitHub cannot be opened.'**
+  /// **'Version {version} is available. Baizi will open the mirror download first; if it falls back to GitHub and cannot be opened, use a network proxy.'**
   String appUpdateDialogBody(String version);
 
   /// No description provided for @sideDrawerLinkCopied.

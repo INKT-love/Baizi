@@ -848,7 +848,7 @@
   "appUpdateUnableToCheck": "暫時無法檢查更新",
   "appUpdateLater": "稍後",
   "appUpdateUpgradeNow": "立即升級",
-  "appUpdateDialogBody": "版本 {version} 已發佈。下載頁位於 GitHub，如無法開啟 GitHub，請使用網路代理。",
+  "appUpdateDialogBody": "版本 {version} 已發佈。白子會優先開啟鏡像下載；如果備用 GitHub 無法開啟，請使用網路代理。",
   "@appUpdateDialogBody": {
     "placeholders": {
       "version": {

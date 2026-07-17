@@ -890,7 +890,7 @@
   "appUpdateUnableToCheck": "暂时无法检查更新",
   "appUpdateLater": "稍后",
   "appUpdateUpgradeNow": "立即升级",
-  "appUpdateDialogBody": "版本 {version} 已发布。下载页位于 GitHub，如无法打开 GitHub，请使用网络代理。",
+  "appUpdateDialogBody": "版本 {version} 已发布。白子会优先打开镜像下载；如果备用 GitHub 无法打开，请使用网络代理。",
   "@appUpdateDialogBody": {
     "placeholders": {
       "version": {

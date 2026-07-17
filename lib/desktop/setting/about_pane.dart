@@ -78,6 +78,17 @@ class _DesktopAboutPaneState extends State<DesktopAboutPane> {
     }
   }
 
+  Future<void> _onUpdateTap(UpdateProvider update) async {
+    if (update.status == UpdateCheckStatus.updateAvailable) {
+      final url = update.available?.bestDownloadUrl();
+      if (url != null && url.isNotEmpty) {
+        await _openUrl(url);
+        return;
+      }
+    }
+    await update.checkForUpdates();
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -182,8 +193,7 @@ class _DesktopAboutPaneState extends State<DesktopAboutPane> {
                     icon: lucide.Lucide.RefreshCw,
                     label: l10n.displaySettingsPageShowUpdatesTitle,
                     detail: updateStatus,
-                    onTap: () =>
-                        context.read<UpdateProvider>().checkForUpdates(),
+                    onTap: () => _onUpdateTap(context.read<UpdateProvider>()),
                   ),
                   const _DeskRowDivider(),
                   _DeskNavRowSvg(

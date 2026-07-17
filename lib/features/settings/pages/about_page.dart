@@ -69,6 +69,17 @@ class _AboutPageState extends State<AboutPage> {
     }
   }
 
+  Future<void> _onUpdateTap(UpdateProvider update) async {
+    if (update.status == UpdateCheckStatus.updateAvailable) {
+      final url = update.available?.bestDownloadUrl();
+      if (url != null && url.isNotEmpty) {
+        await _openUrl(url);
+        return;
+      }
+    }
+    await update.checkForUpdates();
+  }
+
   void _onVersionTap() {
     final now = DateTime.now();
     // Reset the counter if taps are spaced too far apart
@@ -414,7 +425,7 @@ class _AboutPageState extends State<AboutPage> {
                 icon: Lucide.RefreshCw,
                 label: l10n.displaySettingsPageShowUpdatesTitle,
                 detailText: updateStatus,
-                onTap: () => context.read<UpdateProvider>().checkForUpdates(),
+                onTap: () => _onUpdateTap(context.read<UpdateProvider>()),
               ),
               _iosDivider(context),
               _iosNavRowSvgLeading(

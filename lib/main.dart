@@ -508,10 +508,10 @@ class _UpdatePromptControllerState extends State<_UpdatePromptController> {
           FilledButton(
             onPressed: () async {
               Navigator.of(dialogContext).pop();
-              await launchUrl(
-                Uri.parse(url),
-                mode: LaunchMode.externalApplication,
-              );
+              final uri = Uri.parse(url);
+              if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+                await launchUrl(uri, mode: LaunchMode.platformDefault);
+              }
             },
             child: Text(l10n.appUpdateUpgradeNow),
           ),

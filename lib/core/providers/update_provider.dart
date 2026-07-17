@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi' show Abi;
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
@@ -51,22 +52,38 @@ class UpdateInfo {
       return firstAvailable(['ios', 'iosAppStore', 'universal']);
     }
     if (Platform.isAndroid) {
-      return firstAvailable([
-        'android',
-        'androidUniversal',
-        'androidApk',
-        'androidArm64',
-        'android-arm64',
-        'arm64-v8a',
-        'androidArm32',
-        'android-arm32',
-        'armeabi-v7a',
-        'androidX64',
-        'android-x64',
-        'x86_64',
-        'apk',
-        'universal',
-      ]);
+      switch (Abi.current()) {
+        case Abi.androidArm64:
+          return firstAvailable([
+            'androidArm64',
+            'android-arm64',
+            'arm64-v8a',
+            'android',
+            'androidUniversal',
+            'androidApk',
+            'apk',
+            'universal',
+          ]);
+        case Abi.androidArm:
+          return firstAvailable([
+            'androidArm32',
+            'android-arm32',
+            'armeabi-v7a',
+            'android',
+            'androidUniversal',
+            'androidApk',
+            'apk',
+            'universal',
+          ]);
+        default:
+          return firstAvailable([
+            'android',
+            'androidUniversal',
+            'androidApk',
+            'apk',
+            'universal',
+          ]);
+      }
     }
     if (Platform.isMacOS) {
       return firstAvailable(['macos', 'mac', 'darwin', 'universal']);

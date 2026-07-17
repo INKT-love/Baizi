@@ -24,7 +24,7 @@ android {
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionName = flutter.versionName.removeSuffix(".0")
         if (!project.hasProperty("split-per-abi")) {
             ndk {
                 abiFilters += listOf("armeabi-v7a", "arm64-v8a")

@@ -112,8 +112,15 @@ class UpdateInfo {
     final trimmed = rawUrl.trim();
     if (trimmed.isEmpty) return trimmed;
     final uri = Uri.tryParse(trimmed);
-    if (uri == null || uri.hasScheme || sourceUri == null) return trimmed;
-    return sourceUri.resolve(trimmed).toString();
+    if (uri == null || sourceUri == null) return trimmed;
+    final resolved = uri.hasScheme ? uri : sourceUri.resolve(trimmed);
+    if (resolved.scheme == sourceUri.scheme &&
+        resolved.host.toLowerCase() == sourceUri.host.toLowerCase() &&
+        !resolved.hasPort &&
+        sourceUri.hasPort) {
+      return resolved.replace(port: sourceUri.port).toString();
+    }
+    return resolved.toString();
   }
 
   factory UpdateInfo.fromGitHubReleasePageUri(Uri releasePageUri) {

@@ -105,6 +105,8 @@ void main() {
                 'latest': {
                   'version': '1.2.0',
                   'downloads': {
+                    'android':
+                        'https://list.inktandwkx.top/p/server/files/Baizi/Baizi-v1.2.0.apk?sign=abc=:0',
                     'androidArm64': 'Baizi-v1.2.0-arm64-v8a.apk',
                     'universal':
                         'https://list.inktandwkx.top:50000/server/files/Baizi',
@@ -123,6 +125,10 @@ void main() {
 
       expect(provider.status, UpdateCheckStatus.updateAvailable);
       expect(provider.available?.version, '1.2.0');
+      expect(
+        provider.available?.downloads['android'],
+        'https://list.inktandwkx.top:50000/p/server/files/Baizi/Baizi-v1.2.0.apk?sign=abc=:0',
+      );
       expect(
         provider.available?.downloads['androidArm64'],
         'https://list.inktandwkx.top:50000/d/Baizi/Baizi-v1.2.0-arm64-v8a.apk',

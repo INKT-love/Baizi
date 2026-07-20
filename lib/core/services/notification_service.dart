@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
@@ -12,6 +13,13 @@ class NotificationService {
     importance: Importance.high,
     playSound: true,
   );
+  static const AndroidNotificationChannel _menstrualChannel =
+      AndroidNotificationChannel(
+        'baizi_menstrual_care_v1',
+        'Private care reminders',
+        description: 'Discreet local wellbeing reminders',
+        importance: Importance.defaultImportance,
+      );
 
   static Future<void> ensureInitialized() async {
     if (!Platform.isAndroid) return;
@@ -32,9 +40,44 @@ class NotificationService {
         >();
     if (android != null) {
       await android.createNotificationChannel(_channel);
+      await android.createNotificationChannel(_menstrualChannel);
       // Runtime notification permission (Android 13+) should be requested by app UI if needed
     }
     _inited = true;
+  }
+
+  static Future<void> schedulePrivateCareReminder({
+    required int id,
+    required DateTime when,
+  }) async {
+    if (!Platform.isAndroid || !when.isAfter(DateTime.now())) return;
+    await ensureInitialized();
+    await _plugin.zonedSchedule(
+      id,
+      '白子提醒',
+      '记得关注今天的身体状态。',
+      tz.TZDateTime.from(when.toUtc(), tz.UTC),
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _menstrualChannel.id,
+          _menstrualChannel.name,
+          channelDescription: _menstrualChannel.description,
+          visibility: NotificationVisibility.private,
+          category: AndroidNotificationCategory.reminder,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
+
+  static Future<void> cancelPrivateCareReminders() async {
+    if (!Platform.isAndroid) return;
+    await ensureInitialized();
+    for (var id = 4101; id <= 4104; id++) {
+      await _plugin.cancel(id);
+    }
   }
 
   /// Ensure Android 13+ notifications permission is granted (no-op on lower versions/other platforms).

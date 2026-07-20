@@ -10,6 +10,7 @@ import '../../../core/services/api/chat_api_service.dart';
 import '../../../core/services/logging/flutter_logger.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/providers/backup_reminder_provider.dart';
+import '../../../core/providers/menstrual_care_provider.dart';
 import '../../../core/models/chat_item.dart';
 import '../../../core/providers/user_provider.dart';
 import '../../settings/pages/settings_page.dart';
@@ -191,6 +192,8 @@ class _SideDrawerState extends State<SideDrawer> with TickerProviderStateMixin {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final chatService = context.read<ChatService>();
+    final menstrualCare = context.read<MenstrualCareProvider>();
+    final careEnabled = menstrualCare.enabledForConversation(chat.id);
     final isPinned = chatService.getConversation(chat.id)?.isPinned ?? false;
     final isDesktop =
         defaultTargetPlatform == TargetPlatform.macOS ||
@@ -223,6 +226,13 @@ class _SideDrawerState extends State<SideDrawer> with TickerProviderStateMixin {
             label: l10n.sideDrawerMenuRegenerateTitle,
             onTap: () async {
               await _regenerateTitle(context, chat.id);
+            },
+          ),
+          DesktopContextMenuItem(
+            icon: Lucide.Calendar,
+            label: careEnabled ? '关闭经期关怀上下文' : '开启经期关怀上下文',
+            onTap: () async {
+              await menstrualCare.setConversationEnabled(chat.id, !careEnabled);
             },
           ),
           DesktopContextMenuItem(
@@ -408,6 +418,16 @@ class _SideDrawerState extends State<SideDrawer> with TickerProviderStateMixin {
                       label: l10n.sideDrawerMenuRegenerateTitle,
                       action: () async {
                         await _regenerateTitle(context, chat.id);
+                      },
+                    ),
+                    row(
+                      icon: Lucide.Calendar,
+                      label: careEnabled ? '关闭经期关怀上下文' : '开启经期关怀上下文',
+                      action: () async {
+                        await menstrualCare.setConversationEnabled(
+                          chat.id,
+                          !careEnabled,
+                        );
                       },
                     ),
                     row(

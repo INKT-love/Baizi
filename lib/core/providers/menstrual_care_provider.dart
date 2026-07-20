@@ -2,13 +2,18 @@ import 'package:flutter/foundation.dart';
 import '../models/menstrual_care.dart';
 import '../services/menstrual_care_calculator.dart';
 import '../services/menstrual_care_store.dart';
+import '../services/menstrual_reminder_scheduler.dart';
 
 class MenstrualCareProvider extends ChangeNotifier {
-  MenstrualCareProvider({MenstrualCareStore? store})
-    : _store = store ?? MenstrualCareStore() {
+  MenstrualCareProvider({
+    MenstrualCareStore? store,
+    MenstrualReminderScheduler? scheduler,
+  }) : _store = store ?? MenstrualCareStore(),
+       _scheduler = scheduler ?? MenstrualReminderScheduler() {
     load();
   }
   final MenstrualCareStore _store;
+  final MenstrualReminderScheduler _scheduler;
   MenstrualCareProfile? _profile;
   bool _loaded = false;
   bool get loaded => _loaded;
@@ -27,6 +32,7 @@ class MenstrualCareProvider extends ChangeNotifier {
       _profile = null;
     }
     _loaded = true;
+    await _scheduler.reschedule(_profile);
     notifyListeners();
   }
 
@@ -107,6 +113,7 @@ class MenstrualCareProvider extends ChangeNotifier {
   Future<void> clear() async {
     await _store.clear();
     _profile = null;
+    await _scheduler.reschedule(null);
     notifyListeners();
   }
 
@@ -115,6 +122,7 @@ class MenstrualCareProvider extends ChangeNotifier {
   Future<void> _save(MenstrualCareProfile value) async {
     _profile = value;
     await _store.write(value);
+    await _scheduler.reschedule(value);
     notifyListeners();
   }
 }

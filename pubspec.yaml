@@ -108,6 +108,7 @@ dependencies:
     path: ./dependencies/flutter_tts
   flutter_background: ^1.3.0+1
   flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
   image: ^4.8.0
   math_expressions: ^2.6.2
 

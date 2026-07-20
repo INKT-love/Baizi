@@ -565,7 +565,10 @@ class MessageBuilderService {
     try {
       final care = contextProvider.read<MenstrualCareProvider>();
       if (!care.enabledForConversation(conversationId)) return;
-      final context = MenstrualCarePromptContext.build(care.status);
+      final context = MenstrualCarePromptContext.build(
+        care.profile,
+        care.status,
+      );
       if (context != null) _appendToSystemMessage(apiMessages, context);
     } catch (_) {}
   }

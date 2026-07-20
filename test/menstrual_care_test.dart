@@ -56,15 +56,20 @@ void main() {
     );
   });
 
-  test('prompt context contains no exact local dates', () {
-    final status = MenstrualCareCalculator.calculate(
-      profile,
-      now: DateTime(2026, 7, 3),
-    );
-    final prompt = MenstrualCarePromptContext.build(status)!;
-    expect(prompt, isNot(contains('2026-07-01')));
-    expect(prompt, contains('保持当前角色人设'));
-  });
+  test(
+    'prompt context includes the authorized cycle dates for direct answers',
+    () {
+      final status = MenstrualCareCalculator.calculate(
+        profile,
+        now: DateTime(2026, 7, 3),
+      );
+      final prompt = MenstrualCarePromptContext.build(profile, status)!;
+      expect(prompt, contains('2026-07-01'));
+      expect(prompt, contains('2026-07-29'));
+      expect(prompt, contains('必须直接依据上述数据回答'));
+      expect(prompt, contains('保持当前角色人设'));
+    },
+  );
 
   test('recognizer only accepts explicit first-person statements', () {
     expect(

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.accessibilityservice.AccessibilityService
 import android.provider.Settings
-import dev.rikka.shizuku.Shizuku
+import rikka.shizuku.Shizuku
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import java.io.BufferedReader
@@ -52,7 +52,7 @@ object PhoneControlMethodChannel {
 
     private fun execute(context: Context, args: Map<String, Any?>): Map<String, Any?> {
         val action = args["action"]?.toString()?.trim().orEmpty()
-        if (action.isEmpty) return error("invalid_arguments", "action is required")
+        if (action.isEmpty()) return error("invalid_arguments", "action is required")
         val service = PhoneControlAccessibilityService.instance
         return when (action) {
             "get_status" -> ok("Current capability status", status())
@@ -88,7 +88,7 @@ object PhoneControlMethodChannel {
     private fun fileOperation(args: Map<String, Any?>): Map<String, Any?> {
         val operation = args["operation"]?.toString().orEmpty()
         val path = args["path"]?.toString().orEmpty()
-        if (operation.isEmpty || path.isEmpty) return error("invalid_arguments", "operation and path are required")
+        if (operation.isEmpty() || path.isEmpty()) return error("invalid_arguments", "operation and path are required")
         return when (operation) {
             "list" -> shell("ls -la ${quote(path)}")
             "read" -> shell("cat ${quote(path)}")
@@ -109,7 +109,15 @@ object PhoneControlMethodChannel {
     }
 
     private fun runShizuku(command: String): Map<String, Any?> = try {
-        val process = Shizuku.newProcess(arrayOf("sh", "-c", command), null, null)
+        // Shizuku exposes process execution as a restricted Java API. Resolve it
+        // from the bundled library at runtime so Kotlin does not reject it.
+        val processMethod = Shizuku::class.java.getDeclaredMethod(
+            "newProcess",
+            Array<String>::class.java,
+            Array<String>::class.java,
+            String::class.java,
+        ).apply { isAccessible = true }
+        val process = processMethod.invoke(null, arrayOf("sh", "-c", command), null, null) as Process
         val output = BufferedReader(InputStreamReader(process.inputStream)).readText().take(12000)
         val errors = BufferedReader(InputStreamReader(process.errorStream)).readText().take(4000)
         process.waitFor()
@@ -117,13 +125,22 @@ object PhoneControlMethodChannel {
         else error("command_failed", errors.ifBlank { output }, mapOf("channel" to "shizuku", "exitCode" to process.exitValue()))
     } catch (e: Throwable) { error("shizuku_execution_failed", e.message ?: "Shizuku command failed") }
 
-    private fun runRoot(command: String): Map<String, Any?> = try {
-        val process = ProcessBuilder("su", "-c", command).redirectErrorStream(true).start()
-        val output = BufferedReader(InputStreamReader(process.inputStream)).readText().take(12000)
-        if (!process.waitFor(20, TimeUnit.SECONDS)) { process.destroyForcibly(); return error("command_timeout", "Command timed out") }
-        if (process.exitValue() == 0) ok("Command completed", mapOf("output" to output, "channel" to "root"))
-        else error("command_failed", output, mapOf("channel" to "root", "exitCode" to process.exitValue()))
-    } catch (e: Throwable) { error("root_execution_failed", e.message ?: "Root command failed") }
+    private fun runRoot(command: String): Map<String, Any?> {
+        return try {
+            val process = ProcessBuilder("su", "-c", command).redirectErrorStream(true).start()
+            val output = BufferedReader(InputStreamReader(process.inputStream)).readText().take(12000)
+            if (!process.waitFor(20, TimeUnit.SECONDS)) {
+                process.destroyForcibly()
+                error("command_timeout", "Command timed out")
+            } else if (process.exitValue() == 0) {
+                ok("Command completed", mapOf("output" to output, "channel" to "root"))
+            } else {
+                error("command_failed", output, mapOf("channel" to "root", "exitCode" to process.exitValue()))
+            }
+        } catch (e: Throwable) {
+            error("root_execution_failed", e.message ?: "Root command failed")
+        }
+    }
 
     private fun rootAvailable(): Boolean = try {
         val process = ProcessBuilder("su", "-c", "id").start()

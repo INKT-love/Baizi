@@ -5830,4 +5830,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get baiziKeyManagerDeleteTooltip => 'Delete key';
+
+  @override
+  String get menstrualCareTitle => 'Menstrual care';
+
+  @override
+  String get menstrualCareSubtitle =>
+      'Local tracking and considerate chat context';
+
+  @override
+  String get menstrualCareSetup => 'Set up';
+
+  @override
+  String get menstrualCareLastStart => 'Most recent start date';
+
+  @override
+  String get menstrualCareCycleDays => 'Average cycle length';
+
+  @override
+  String get menstrualCarePeriodDays => 'Period length';
+
+  @override
+  String get menstrualCareSave => 'Save';
+
+  @override
+  String get menstrualCareContext => 'Use menstrual care in chats';
+
+  @override
+  String get menstrualCareAutoRecord => 'Recognize explicit starts and ends';
+
+  @override
+  String get menstrualCarePrivacy =>
+      'Data stays in secure local storage and is excluded from chats and backups.';
 }

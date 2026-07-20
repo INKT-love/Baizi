@@ -10711,6 +10711,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete key'**
   String get baiziKeyManagerDeleteTooltip;
+
+  /// No description provided for @menstrualCareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Menstrual care'**
+  String get menstrualCareTitle;
+
+  /// No description provided for @menstrualCareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local tracking and considerate chat context'**
+  String get menstrualCareSubtitle;
+
+  /// No description provided for @menstrualCareSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get menstrualCareSetup;
+
+  /// No description provided for @menstrualCareLastStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Most recent start date'**
+  String get menstrualCareLastStart;
+
+  /// No description provided for @menstrualCareCycleDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Average cycle length'**
+  String get menstrualCareCycleDays;
+
+  /// No description provided for @menstrualCarePeriodDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Period length'**
+  String get menstrualCarePeriodDays;
+
+  /// No description provided for @menstrualCareSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get menstrualCareSave;
+
+  /// No description provided for @menstrualCareContext.
+  ///
+  /// In en, this message translates to:
+  /// **'Use menstrual care in chats'**
+  String get menstrualCareContext;
+
+  /// No description provided for @menstrualCareAutoRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognize explicit starts and ends'**
+  String get menstrualCareAutoRecord;
+
+  /// No description provided for @menstrualCarePrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Data stays in secure local storage and is excluded from chats and backups.'**
+  String get menstrualCarePrivacy;
 }
 
 class _AppLocalizationsDelegate

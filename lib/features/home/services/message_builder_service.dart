@@ -20,6 +20,8 @@ import '../../../core/services/world_book_store.dart';
 import '../../../core/services/search/search_tool_service.dart';
 import '../../../core/providers/instruction_injection_provider.dart';
 import '../../../core/providers/world_book_provider.dart';
+import '../../../core/providers/menstrual_care_provider.dart';
+import '../../../core/services/menstrual_care_prompt_context.dart';
 import '../../../core/services/api/builtin_tools.dart';
 import '../../../core/models/assistant_regex.dart';
 import '../../../core/utils/multimodal_input_utils.dart';
@@ -554,6 +556,18 @@ class MessageBuilderService {
       apiMessages,
       PromptTransformer.replacePlaceholders(raw, vars),
     );
+  }
+
+  void injectMenstrualCareContext(
+    List<Map<String, dynamic>> apiMessages, {
+    required String? conversationId,
+  }) {
+    try {
+      final care = contextProvider.read<MenstrualCareProvider>();
+      if (!care.enabledForConversation(conversationId)) return;
+      final context = MenstrualCarePromptContext.build(care.status);
+      if (context != null) _appendToSystemMessage(apiMessages, context);
+    } catch (_) {}
   }
 
   /// Inject memory prompts and recent chats reference into apiMessages.

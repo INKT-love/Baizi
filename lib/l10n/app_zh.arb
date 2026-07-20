@@ -2077,5 +2077,15 @@
   },
   "baiziKeyManagerSwitching": "正在切换 Key…",
   "baiziKeyManagerRenameTooltip": "重命名 Key",
-  "baiziKeyManagerDeleteTooltip": "删除 Key"
+  "baiziKeyManagerDeleteTooltip": "删除 Key",
+  "menstrualCareTitle": "经期关怀",
+  "menstrualCareSubtitle": "本地记录与聊天关怀上下文",
+  "menstrualCareSetup": "开始设置",
+  "menstrualCareLastStart": "最近一次开始日期",
+  "menstrualCareCycleDays": "平均周期天数",
+  "menstrualCarePeriodDays": "经期持续天数",
+  "menstrualCareSave": "保存",
+  "menstrualCareContext": "聊天中启用经期关怀",
+  "menstrualCareAutoRecord": "自动识别开始和结束",
+  "menstrualCarePrivacy": "数据仅保存在本机安全存储中，不会写入聊天记录或备份。"
 }

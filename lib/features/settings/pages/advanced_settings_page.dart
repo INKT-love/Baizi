@@ -13,6 +13,7 @@ import 'log_viewer_page.dart';
 import 'network_proxy_page.dart';
 import 'storage_space_page.dart';
 import 'tts_services_page.dart';
+import 'menstrual_care_page.dart';
 
 class AdvancedSettingsPage extends StatelessWidget {
   const AdvancedSettingsPage({super.key});
@@ -21,6 +22,11 @@ class AdvancedSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final destinations = <_AdvancedDestination>[
+      _AdvancedDestination(
+        icon: Lucide.Calendar,
+        label: l10n.menstrualCareTitle,
+        page: const MenstrualCarePage(),
+      ),
       _AdvancedDestination(
         icon: Lucide.SlidersHorizontal,
         label: l10n.settingsPageDefaultModel,

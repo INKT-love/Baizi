@@ -193,6 +193,10 @@ class MessageGenerationService {
       assistant,
       modelId,
     );
+    messageBuilderService.injectMenstrualCareContext(
+      apiMessages,
+      conversationId: currentConversation?.id,
+    );
 
     // Apply context limit and inline images
     messageBuilderService.applyContextLimit(apiMessages, assistant);

@@ -5595,6 +5595,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get baiziKeyManagerDeleteTooltip => '删除 Key';
+
+  @override
+  String get menstrualCareTitle => '经期关怀';
+
+  @override
+  String get menstrualCareSubtitle => '本地记录与聊天关怀上下文';
+
+  @override
+  String get menstrualCareSetup => '开始设置';
+
+  @override
+  String get menstrualCareLastStart => '最近一次开始日期';
+
+  @override
+  String get menstrualCareCycleDays => '平均周期天数';
+
+  @override
+  String get menstrualCarePeriodDays => '经期持续天数';
+
+  @override
+  String get menstrualCareSave => '保存';
+
+  @override
+  String get menstrualCareContext => '聊天中启用经期关怀';
+
+  @override
+  String get menstrualCareAutoRecord => '自动识别开始和结束';
+
+  @override
+  String get menstrualCarePrivacy => '数据仅保存在本机安全存储中，不会写入聊天记录或备份。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -11188,6 +11218,36 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get baiziKeyManagerDeleteTooltip => '删除 Key';
+
+  @override
+  String get menstrualCareTitle => '经期关怀';
+
+  @override
+  String get menstrualCareSubtitle => '本地记录与聊天关怀上下文';
+
+  @override
+  String get menstrualCareSetup => '开始设置';
+
+  @override
+  String get menstrualCareLastStart => '最近一次开始日期';
+
+  @override
+  String get menstrualCareCycleDays => '平均周期天数';
+
+  @override
+  String get menstrualCarePeriodDays => '经期持续天数';
+
+  @override
+  String get menstrualCareSave => '保存';
+
+  @override
+  String get menstrualCareContext => '聊天中启用经期关怀';
+
+  @override
+  String get menstrualCareAutoRecord => '自动识别开始和结束';
+
+  @override
+  String get menstrualCarePrivacy => '数据仅保存在本机安全存储中，不会写入聊天记录或备份。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -16781,4 +16841,34 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get baiziKeyManagerDeleteTooltip => '刪除 Key';
+
+  @override
+  String get menstrualCareTitle => '經期關懷';
+
+  @override
+  String get menstrualCareSubtitle => '本地記錄與聊天關懷上下文';
+
+  @override
+  String get menstrualCareSetup => '開始設定';
+
+  @override
+  String get menstrualCareLastStart => '最近一次開始日期';
+
+  @override
+  String get menstrualCareCycleDays => '平均週期天數';
+
+  @override
+  String get menstrualCarePeriodDays => '經期持續天數';
+
+  @override
+  String get menstrualCareSave => '儲存';
+
+  @override
+  String get menstrualCareContext => '聊天中啟用經期關懷';
+
+  @override
+  String get menstrualCareAutoRecord => '自動辨識開始和結束';
+
+  @override
+  String get menstrualCarePrivacy => '資料僅保存在本機安全儲存中，不會寫入聊天記錄或備份。';
 }

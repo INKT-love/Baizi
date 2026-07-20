@@ -7,6 +7,8 @@ import '../../../core/models/conversation.dart';
 import '../../../core/models/token_usage.dart';
 import '../../../core/providers/assistant_provider.dart';
 import '../../../core/providers/settings_provider.dart';
+import '../../../core/providers/menstrual_care_provider.dart';
+import '../../../core/services/menstrual_care_message_recognizer.dart';
 import '../../../core/services/api/chat_api_service.dart';
 import '../../../core/services/chat/chat_service.dart';
 import '../../../core/services/ios_background_generation.dart';
@@ -447,6 +449,19 @@ class ChatActions {
     }
 
     final settings = contextProvider.read<SettingsProvider>();
+    try {
+      final care = contextProvider.read<MenstrualCareProvider>();
+      if (care.profile?.autoRecordEnabled == true) {
+        switch (MenstrualCareMessageRecognizer.recognize(content)) {
+          case MenstrualRecordIntent.start:
+            await care.recordStart(DateTime.now(), automatic: true);
+          case MenstrualRecordIntent.end:
+            await care.recordEnd(DateTime.now(), automatic: true);
+          case MenstrualRecordIntent.none:
+            break;
+        }
+      }
+    } catch (_) {}
     final assistant = contextProvider
         .read<AssistantProvider>()
         .currentAssistant;

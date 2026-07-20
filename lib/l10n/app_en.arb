@@ -2500,5 +2500,15 @@
   },
   "baiziKeyManagerSwitching": "Switching key...",
   "baiziKeyManagerRenameTooltip": "Rename key",
-  "baiziKeyManagerDeleteTooltip": "Delete key"
+  "baiziKeyManagerDeleteTooltip": "Delete key",
+  "menstrualCareTitle": "Menstrual care",
+  "menstrualCareSubtitle": "Local tracking and considerate chat context",
+  "menstrualCareSetup": "Set up",
+  "menstrualCareLastStart": "Most recent start date",
+  "menstrualCareCycleDays": "Average cycle length",
+  "menstrualCarePeriodDays": "Period length",
+  "menstrualCareSave": "Save",
+  "menstrualCareContext": "Use menstrual care in chats",
+  "menstrualCareAutoRecord": "Recognize explicit starts and ends",
+  "menstrualCarePrivacy": "Data stays in secure local storage and is excluded from chats and backups."
 }

@@ -26,13 +26,13 @@ class MenstrualCareCalculator {
       phase = MenstrualPhase.unknown;
     else if (cycleDay <= profile.periodDays)
       phase = MenstrualPhase.period;
-    else if (cycleDay == effectiveCycle)
+    else if (cycleDay == effectiveCycle + 1)
       phase = MenstrualPhase.expectedStart;
-    else if (cycleDay > effectiveCycle)
+    else if (cycleDay > effectiveCycle + 1)
       phase = MenstrualPhase.delayed;
     else if ((cycleDay - (effectiveCycle ~/ 2)).abs() <= 2)
       phase = MenstrualPhase.ovulationWindow;
-    else if (cycleDay >= effectiveCycle - 5)
+    else if (cycleDay >= effectiveCycle - 4)
       phase = MenstrualPhase.prePeriod;
     else
       phase = MenstrualPhase.postPeriod;

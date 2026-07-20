@@ -15,6 +15,13 @@ void main() {
     expect(
       MenstrualCareCalculator.calculate(
         profile,
+        now: DateTime(2026, 7, 29),
+      ).phase,
+      MenstrualPhase.expectedStart,
+    );
+    expect(
+      MenstrualCareCalculator.calculate(
+        profile,
         now: DateTime(2026, 7, 3),
       ).phase,
       MenstrualPhase.period,

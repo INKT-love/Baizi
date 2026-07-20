@@ -47,6 +47,8 @@ import 'dart:io'
     show Platform; // kept for global override usage inside provider
 import 'core/services/android_background.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/menstrual_care_proactive_scheduler.dart';
+import 'package:workmanager/workmanager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -59,6 +61,9 @@ Future<void> main() async {
   await runZoned(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+      if (!kIsWeb && Platform.isAndroid) {
+        await Workmanager().initialize(menstrualCareCallbackDispatcher);
+      }
       FlutterLogger.installGlobalHandlers();
       try {
         final prefs = await SharedPreferences.getInstance();

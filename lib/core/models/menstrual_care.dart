@@ -8,6 +8,8 @@ enum MenstrualPhase {
   delayed,
 }
 
+enum MenstrualCareDestination { recentConversation, dedicatedConversation }
+
 class MenstrualCycleRecord {
   const MenstrualCycleRecord({
     required this.startDate,
@@ -43,6 +45,14 @@ class MenstrualCareProfile {
     this.autoRecordEnabled = true,
     this.reminderMinutes = 540,
     this.advanceReminderDays = 1,
+    this.proactiveCareEnabled = false,
+    this.proactiveCareMinutes = 540,
+    this.proactiveCareDestination = MenstrualCareDestination.recentConversation,
+    this.proactiveCareAllowMobileData = true,
+    this.proactiveCareConversationId,
+    this.proactiveCareLastAttemptDay,
+    this.proactiveCareLastSuccessDay,
+    this.proactiveCareLastError,
     this.records = const [],
     this.disabledConversationIds = const [],
   });
@@ -54,6 +64,14 @@ class MenstrualCareProfile {
   final bool autoRecordEnabled;
   final int reminderMinutes;
   final int advanceReminderDays;
+  final bool proactiveCareEnabled;
+  final int proactiveCareMinutes;
+  final MenstrualCareDestination proactiveCareDestination;
+  final bool proactiveCareAllowMobileData;
+  final String? proactiveCareConversationId;
+  final String? proactiveCareLastAttemptDay;
+  final String? proactiveCareLastSuccessDay;
+  final String? proactiveCareLastError;
   final List<MenstrualCycleRecord> records;
   final List<String> disabledConversationIds;
 
@@ -66,6 +84,16 @@ class MenstrualCareProfile {
     bool? autoRecordEnabled,
     int? reminderMinutes,
     int? advanceReminderDays,
+    bool? proactiveCareEnabled,
+    int? proactiveCareMinutes,
+    MenstrualCareDestination? proactiveCareDestination,
+    bool? proactiveCareAllowMobileData,
+    String? proactiveCareConversationId,
+    bool clearProactiveCareConversationId = false,
+    String? proactiveCareLastAttemptDay,
+    String? proactiveCareLastSuccessDay,
+    String? proactiveCareLastError,
+    bool clearProactiveCareLastError = false,
     List<MenstrualCycleRecord>? records,
     List<String>? disabledConversationIds,
   }) => MenstrualCareProfile(
@@ -77,6 +105,22 @@ class MenstrualCareProfile {
     autoRecordEnabled: autoRecordEnabled ?? this.autoRecordEnabled,
     reminderMinutes: reminderMinutes ?? this.reminderMinutes,
     advanceReminderDays: advanceReminderDays ?? this.advanceReminderDays,
+    proactiveCareEnabled: proactiveCareEnabled ?? this.proactiveCareEnabled,
+    proactiveCareMinutes: proactiveCareMinutes ?? this.proactiveCareMinutes,
+    proactiveCareDestination:
+        proactiveCareDestination ?? this.proactiveCareDestination,
+    proactiveCareAllowMobileData:
+        proactiveCareAllowMobileData ?? this.proactiveCareAllowMobileData,
+    proactiveCareConversationId: clearProactiveCareConversationId
+        ? null
+        : (proactiveCareConversationId ?? this.proactiveCareConversationId),
+    proactiveCareLastAttemptDay:
+        proactiveCareLastAttemptDay ?? this.proactiveCareLastAttemptDay,
+    proactiveCareLastSuccessDay:
+        proactiveCareLastSuccessDay ?? this.proactiveCareLastSuccessDay,
+    proactiveCareLastError: clearProactiveCareLastError
+        ? null
+        : (proactiveCareLastError ?? this.proactiveCareLastError),
     records: records ?? this.records,
     disabledConversationIds:
         disabledConversationIds ?? this.disabledConversationIds,
@@ -90,6 +134,14 @@ class MenstrualCareProfile {
     'autoRecordEnabled': autoRecordEnabled,
     'reminderMinutes': reminderMinutes,
     'advanceReminderDays': advanceReminderDays,
+    'proactiveCareEnabled': proactiveCareEnabled,
+    'proactiveCareMinutes': proactiveCareMinutes,
+    'proactiveCareDestination': proactiveCareDestination.name,
+    'proactiveCareAllowMobileData': proactiveCareAllowMobileData,
+    'proactiveCareConversationId': proactiveCareConversationId,
+    'proactiveCareLastAttemptDay': proactiveCareLastAttemptDay,
+    'proactiveCareLastSuccessDay': proactiveCareLastSuccessDay,
+    'proactiveCareLastError': proactiveCareLastError,
     'records': records.map((e) => e.toJson()).toList(),
     'disabledConversationIds': disabledConversationIds,
   };
@@ -104,6 +156,18 @@ class MenstrualCareProfile {
     autoRecordEnabled: json['autoRecordEnabled'] != false,
     reminderMinutes: (json['reminderMinutes'] as num?)?.toInt() ?? 540,
     advanceReminderDays: (json['advanceReminderDays'] as num?)?.toInt() ?? 1,
+    proactiveCareEnabled: json['proactiveCareEnabled'] == true,
+    proactiveCareMinutes:
+        (json['proactiveCareMinutes'] as num?)?.toInt() ?? 540,
+    proactiveCareDestination: MenstrualCareDestination.values.firstWhere(
+      (value) => value.name == json['proactiveCareDestination'],
+      orElse: () => MenstrualCareDestination.recentConversation,
+    ),
+    proactiveCareAllowMobileData: json['proactiveCareAllowMobileData'] != false,
+    proactiveCareConversationId: json['proactiveCareConversationId'] as String?,
+    proactiveCareLastAttemptDay: json['proactiveCareLastAttemptDay'] as String?,
+    proactiveCareLastSuccessDay: json['proactiveCareLastSuccessDay'] as String?,
+    proactiveCareLastError: json['proactiveCareLastError'] as String?,
     records: ((json['records'] as List?) ?? const [])
         .whereType<Map>()
         .map((e) => MenstrualCycleRecord.fromJson(Map<String, dynamic>.from(e)))

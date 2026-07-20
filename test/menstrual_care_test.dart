@@ -3,6 +3,7 @@ import '../lib/core/models/menstrual_care.dart';
 import '../lib/core/services/menstrual_care_calculator.dart';
 import '../lib/core/services/menstrual_care_message_recognizer.dart';
 import '../lib/core/services/menstrual_care_prompt_context.dart';
+import '../lib/core/services/menstrual_care_proactive_logic.dart';
 import '../lib/core/providers/menstrual_care_provider.dart';
 import '../lib/core/services/menstrual_care_store.dart';
 import '../lib/core/services/menstrual_reminder_scheduler.dart';
@@ -70,6 +71,35 @@ void main() {
       expect(prompt, contains('保持当前角色人设'));
     },
   );
+
+  test('proactive care runs once daily during a period and flags end day', () {
+    final active = MenstrualCareProfile(
+      lastStartDate: DateTime(2026, 7, 1),
+      periodDays: 3,
+      proactiveCareEnabled: true,
+      proactiveCareMinutes: 9 * 60,
+      records: [MenstrualCycleRecord(startDate: DateTime(2026, 7, 1))],
+    );
+    final firstDay = MenstrualCareProactiveLogic.evaluate(
+      active,
+      now: DateTime(2026, 7, 1, 9),
+    );
+    expect(firstDay.shouldRun, isTrue);
+    expect(firstDay.isExpectedEndDay, isFalse);
+    final endDay = MenstrualCareProactiveLogic.evaluate(
+      active,
+      now: DateTime(2026, 7, 3, 9),
+    );
+    expect(endDay.shouldRun, isTrue);
+    expect(endDay.isExpectedEndDay, isTrue);
+    expect(
+      MenstrualCareProactiveLogic.evaluate(
+        active.copyWith(proactiveCareLastAttemptDay: '2026-07-01T00:00:00.000'),
+        now: DateTime(2026, 7, 1, 10),
+      ).shouldRun,
+      isFalse,
+    );
+  });
 
   test('recognizer only accepts explicit first-person statements', () {
     expect(

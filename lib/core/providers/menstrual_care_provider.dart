@@ -3,6 +3,7 @@ import '../models/menstrual_care.dart';
 import '../services/menstrual_care_calculator.dart';
 import '../services/menstrual_care_store.dart';
 import '../services/menstrual_reminder_scheduler.dart';
+import '../services/menstrual_care_proactive_scheduler.dart';
 
 class MenstrualCareProvider extends ChangeNotifier {
   MenstrualCareProvider({
@@ -14,6 +15,8 @@ class MenstrualCareProvider extends ChangeNotifier {
   }
   final MenstrualCareStore _store;
   final MenstrualReminderScheduler _scheduler;
+  final MenstrualCareProactiveScheduler _proactiveScheduler =
+      MenstrualCareProactiveScheduler();
   MenstrualCareProfile? _profile;
   bool _loaded = false;
   bool get loaded => _loaded;
@@ -37,6 +40,9 @@ class MenstrualCareProvider extends ChangeNotifier {
     } catch (_) {
       // Reminder scheduling must never prevent private data from loading.
     }
+    try {
+      await _proactiveScheduler.reschedule(_profile);
+    } catch (_) {}
     notifyListeners();
   }
 
@@ -72,6 +78,50 @@ class MenstrualCareProvider extends ChangeNotifier {
         autoRecordEnabled: autoRecordEnabled,
         reminderMinutes: reminderMinutes,
         advanceReminderDays: advanceReminderDays,
+      ),
+    );
+  }
+
+  Future<void> updateProactiveCare({
+    bool? enabled,
+    int? minutesOfDay,
+    MenstrualCareDestination? destination,
+    bool? allowMobileData,
+    String? conversationId,
+    bool clearConversationId = false,
+  }) async {
+    final profile = _required;
+    final minutes = minutesOfDay ?? profile.proactiveCareMinutes;
+    if (minutes < 0 || minutes >= 24 * 60) {
+      throw ArgumentError.value(minutes, 'minutesOfDay');
+    }
+    await _save(
+      profile.copyWith(
+        proactiveCareEnabled: enabled,
+        proactiveCareMinutes: minutes,
+        proactiveCareDestination: destination,
+        proactiveCareAllowMobileData: allowMobileData,
+        proactiveCareConversationId: conversationId,
+        clearProactiveCareConversationId: clearConversationId,
+      ),
+    );
+  }
+
+  Future<void> recordProactiveCareAttempt({
+    required DateTime now,
+    required bool success,
+    String? error,
+  }) async {
+    final profile = _required;
+    final day = dayOnly(now).toIso8601String();
+    await _save(
+      profile.copyWith(
+        proactiveCareLastAttemptDay: day,
+        proactiveCareLastSuccessDay: success
+            ? day
+            : profile.proactiveCareLastSuccessDay,
+        proactiveCareLastError: error,
+        clearProactiveCareLastError: success,
       ),
     );
   }
@@ -121,6 +171,9 @@ class MenstrualCareProvider extends ChangeNotifier {
     try {
       await _scheduler.reschedule(null);
     } catch (_) {}
+    try {
+      await _proactiveScheduler.reschedule(null);
+    } catch (_) {}
     notifyListeners();
   }
 
@@ -135,5 +188,8 @@ class MenstrualCareProvider extends ChangeNotifier {
     } catch (_) {
       // The saved cycle remains usable when notification permission/API fails.
     }
+    try {
+      await _proactiveScheduler.reschedule(value);
+    } catch (_) {}
   }
 }

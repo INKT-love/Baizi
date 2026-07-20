@@ -119,6 +119,60 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
     }
   }
 
+  Future<void> _pickProactiveTime(MenstrualCareProvider care) async {
+    final profile = care.profile;
+    if (profile == null) return;
+    final value = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: profile.proactiveCareMinutes ~/ 60,
+        minute: profile.proactiveCareMinutes % 60,
+      ),
+    );
+    if (value == null) return;
+    await care.updateProactiveCare(
+      minutesOfDay: value.hour * 60 + value.minute,
+    );
+  }
+
+  Future<void> _pickProactiveDestination(MenstrualCareProvider care) async {
+    final profile = care.profile;
+    if (profile == null) return;
+    final selected = await showModalBottomSheet<MenstrualCareDestination>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('最近使用的聊天'),
+              subtitle: const Text('默认，保持当前聊天的人设'),
+              onTap: () => Navigator.pop(
+                context,
+                MenstrualCareDestination.recentConversation,
+              ),
+            ),
+            ListTile(
+              title: const Text('固定“经期关怀”聊天'),
+              subtitle: const Text('首次主动关怀时自动创建'),
+              onTap: () => Navigator.pop(
+                context,
+                MenstrualCareDestination.dedicatedConversation,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (selected == null) return;
+    await care.updateProactiveCare(
+      destination: selected,
+      clearConversationId:
+          selected != profile.proactiveCareDestination ||
+          selected == MenstrualCareDestination.recentConversation,
+    );
+  }
+
   String _phase(MenstrualPhase phase) => switch (phase) {
     MenstrualPhase.period => '经期中',
     MenstrualPhase.postPeriod => '经期后',
@@ -218,6 +272,43 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
               value: profile.remindersEnabled,
               onChanged: (v) => care.updateSettings(remindersEnabled: v),
             ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('主动经期关怀'),
+              subtitle: const Text('每天会请求当前模型生成一条关心回复，可能消耗 API 额度'),
+              value: profile.proactiveCareEnabled,
+              onChanged: (v) => care.updateProactiveCare(enabled: v),
+            ),
+            if (profile.proactiveCareEnabled) ...[
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('关怀时间'),
+                subtitle: Text(
+                  '${(profile.proactiveCareMinutes ~/ 60).toString().padLeft(2, '0')}:${(profile.proactiveCareMinutes % 60).toString().padLeft(2, '0')}',
+                ),
+                trailing: const Icon(Icons.schedule),
+                onTap: () => _pickProactiveTime(care),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('发送到'),
+                subtitle: Text(
+                  profile.proactiveCareDestination ==
+                          MenstrualCareDestination.recentConversation
+                      ? '最近使用的聊天'
+                      : '固定“经期关怀”聊天',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _pickProactiveDestination(care),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('允许使用移动网络'),
+                value: profile.proactiveCareAllowMobileData,
+                onChanged: (value) =>
+                    care.updateProactiveCare(allowMobileData: value),
+              ),
+            ],
             const SizedBox(height: 12),
             Row(
               children: [

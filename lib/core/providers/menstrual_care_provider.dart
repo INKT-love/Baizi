@@ -32,7 +32,11 @@ class MenstrualCareProvider extends ChangeNotifier {
       _profile = null;
     }
     _loaded = true;
-    await _scheduler.reschedule(_profile);
+    try {
+      await _scheduler.reschedule(_profile);
+    } catch (_) {
+      // Reminder scheduling must never prevent private data from loading.
+    }
     notifyListeners();
   }
 
@@ -93,14 +97,14 @@ class MenstrualCareProvider extends ChangeNotifier {
     await _save(p.copyWith(lastStartDate: day, records: records));
   }
 
-  Future<void> recordEnd(DateTime date, {bool automatic = false}) async {
+  Future<bool> recordEnd(DateTime date, {bool automatic = false}) async {
     final p = _required;
     final day = dayOnly(date);
     final records = [...p.records];
     final index = records.lastIndexWhere(
       (r) => !r.startDate.isAfter(day) && r.endDate == null,
     );
-    if (index < 0) return;
+    if (index < 0) return false;
     final item = records[index];
     records[index] = MenstrualCycleRecord(
       startDate: item.startDate,
@@ -108,12 +112,15 @@ class MenstrualCareProvider extends ChangeNotifier {
       automatic: automatic,
     );
     await _save(p.copyWith(records: records));
+    return true;
   }
 
   Future<void> clear() async {
     await _store.clear();
     _profile = null;
-    await _scheduler.reschedule(null);
+    try {
+      await _scheduler.reschedule(null);
+    } catch (_) {}
     notifyListeners();
   }
 
@@ -122,7 +129,11 @@ class MenstrualCareProvider extends ChangeNotifier {
   Future<void> _save(MenstrualCareProfile value) async {
     _profile = value;
     await _store.write(value);
-    await _scheduler.reschedule(value);
     notifyListeners();
+    try {
+      await _scheduler.reschedule(value);
+    } catch (_) {
+      // The saved cycle remains usable when notification permission/API fails.
+    }
   }
 }

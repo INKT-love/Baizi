@@ -3,6 +3,27 @@ import '../lib/core/models/menstrual_care.dart';
 import '../lib/core/services/menstrual_care_calculator.dart';
 import '../lib/core/services/menstrual_care_message_recognizer.dart';
 import '../lib/core/services/menstrual_care_prompt_context.dart';
+import '../lib/core/providers/menstrual_care_provider.dart';
+import '../lib/core/services/menstrual_care_store.dart';
+import '../lib/core/services/menstrual_reminder_scheduler.dart';
+
+class _MemoryStore extends MenstrualCareStore {
+  MenstrualCareProfile? value;
+
+  @override
+  Future<void> clear() async => value = null;
+
+  @override
+  Future<MenstrualCareProfile?> read() async => value;
+
+  @override
+  Future<void> write(MenstrualCareProfile next) async => value = next;
+}
+
+class _NoopScheduler extends MenstrualReminderScheduler {
+  @override
+  Future<void> reschedule(MenstrualCareProfile? profile) async {}
+}
 
 void main() {
   final profile = MenstrualCareProfile(
@@ -58,5 +79,39 @@ void main() {
       MenstrualCareMessageRecognizer.recognize('“我今天来月经了”是角色台词'),
       MenstrualRecordIntent.none,
     );
+    expect(
+      MenstrualCareMessageRecognizer.recognize('我今天月经开始了'),
+      MenstrualRecordIntent.start,
+    );
+    expect(
+      MenstrualCareMessageRecognizer.recognize('我姨妈结束了'),
+      MenstrualRecordIntent.end,
+    );
+    expect(
+      MenstrualCareMessageRecognizer.recognize('她今天月经来了'),
+      MenstrualRecordIntent.none,
+    );
   });
+
+  test(
+    'manual end reports whether an open record exists and reset clears data',
+    () async {
+      final store = _MemoryStore();
+      final provider = MenstrualCareProvider(
+        store: store,
+        scheduler: _NoopScheduler(),
+      );
+      await provider.load();
+      await provider.configure(
+        lastStartDate: DateTime(2026, 7, 1),
+        cycleDays: 28,
+        periodDays: 5,
+      );
+      expect(await provider.recordEnd(DateTime(2026, 7, 5)), isTrue);
+      expect(await provider.recordEnd(DateTime(2026, 7, 5)), isFalse);
+      await provider.clear();
+      expect(provider.profile, isNull);
+      expect(store.value, isNull);
+    },
+  );
 }

@@ -49,6 +49,76 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
     }
   }
 
+  Future<void> _recordStart() async {
+    try {
+      await context.read<MenstrualCareProvider>().recordStart(DateTime.now());
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('已记录今天为经期开始日。')));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('记录失败，请稍后重试。')));
+      }
+    }
+  }
+
+  Future<void> _recordEnd() async {
+    try {
+      final recorded = await context.read<MenstrualCareProvider>().recordEnd(
+        DateTime.now(),
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(recorded ? '已记录今天为经期结束日。' : '还没有可结束的经期记录。')),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('记录失败，请稍后重试。')));
+      }
+    }
+  }
+
+  Future<void> _reset() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('重置经期关怀？'),
+        content: const Text('这会清除本机的周期记录和提醒设置，无法恢复。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('重置'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await context.read<MenstrualCareProvider>().clear();
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('经期关怀已重置。')));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('重置失败，请稍后重试。')));
+      }
+    }
+  }
+
   String _phase(MenstrualPhase phase) => switch (phase) {
     MenstrualPhase.period => '经期中',
     MenstrualPhase.postPeriod => '经期后',
@@ -153,20 +223,24 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => care.recordStart(DateTime.now()),
+                    onPressed: _recordStart,
                     child: const Text('今天开始'),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => care.recordEnd(DateTime.now()),
+                    onPressed: _recordEnd,
                     child: const Text('今天结束'),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(onPressed: _reset, child: const Text('重置经期关怀')),
+            ),
             Text(
               l10n.menstrualCarePrivacy,
               style: Theme.of(context).textTheme.bodySmall,

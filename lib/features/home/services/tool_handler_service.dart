@@ -15,6 +15,7 @@ import '../../../core/services/search/search_tool_service.dart';
 import 'ask_user_interaction_service.dart';
 import 'local_tools_service.dart';
 import 'tool_approval_service.dart';
+import '../../phone_control/services/phone_control_service.dart';
 
 /// 工具调用处理服务
 ///
@@ -192,6 +193,12 @@ class ToolHandlerService {
     toolDefs.addAll(
       LocalToolsService.buildToolDefinitions(
         assistant: assistant,
+        supportsTools: supportsTools,
+      ),
+    );
+    toolDefs.addAll(
+      PhoneControlService.buildToolDefinitions(
+        enabled: settings.phoneControlEnabled,
         supportsTools: supportsTools,
       ),
     );
@@ -386,6 +393,14 @@ class ToolHandlerService {
         );
         if (localResult != null) {
           return localResult;
+        }
+
+        if (name == PhoneControlService.toolName) {
+          return PhoneControlService.execute(
+            arguments: args,
+            settings: settings,
+            approvalService: approvalService,
+          );
         }
 
         if (name == LocalToolNames.askUser &&

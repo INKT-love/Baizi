@@ -47,6 +47,8 @@ enum DesktopMessageNavButtonsMode {
 // Mobile: message navigation buttons visibility mode
 enum MobileMessageNavButtonsMode { always, scroll, never }
 
+enum PhoneControlConfirmationMode { riskBased, confirmAll, allowAll }
+
 enum _MigrationResult { noChange, applied, failed }
 
 class SettingsProvider extends ChangeNotifier {
@@ -239,6 +241,9 @@ class SettingsProvider extends ChangeNotifier {
   // Android background chat generation mode
   static const String _androidBackgroundChatModeKey =
       'android_background_chat_mode_v1';
+  static const String _phoneControlEnabledKey = 'phone_control_enabled_v1';
+  static const String _phoneControlConfirmationModeKey =
+      'phone_control_confirmation_mode_v1';
   // iOS background generation settings
   static const String _iosBackgroundGenerationEnabledKey =
       'ios_background_generation_enabled_v1';
@@ -1252,6 +1257,10 @@ class SettingsProvider extends ChangeNotifier {
     // Apply global haptics to service layer
     Haptics.setEnabled(_hapticsGlobalEnabled);
     _showAppUpdates = prefs.getBool(_displayShowAppUpdatesKey) ?? true;
+    _phoneControlEnabled = prefs.getBool(_phoneControlEnabledKey) ?? false;
+    _phoneControlConfirmationMode = _parsePhoneControlConfirmationMode(
+      prefs.getString(_phoneControlConfirmationModeKey),
+    );
     _keepSidebarOpenOnAssistantTap =
         prefs.getBool(_displayKeepSidebarOpenOnAssistantTapKey) ?? false;
     _keepSidebarOpenOnTopicTap =
@@ -4537,6 +4546,37 @@ DO NOT GIVE ANSWERS OR DO HOMEWORK FOR THE USER. If the user asks a math or logi
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_displayShowAppUpdatesKey, v);
+  }
+
+  bool _phoneControlEnabled = false;
+  bool get phoneControlEnabled => _phoneControlEnabled;
+  Future<void> setPhoneControlEnabled(bool value) async {
+    if (_phoneControlEnabled == value) return;
+    _phoneControlEnabled = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_phoneControlEnabledKey, value);
+  }
+
+  PhoneControlConfirmationMode _phoneControlConfirmationMode =
+      PhoneControlConfirmationMode.riskBased;
+  PhoneControlConfirmationMode get phoneControlConfirmationMode =>
+      _phoneControlConfirmationMode;
+  Future<void> setPhoneControlConfirmationMode(
+    PhoneControlConfirmationMode value,
+  ) async {
+    if (_phoneControlConfirmationMode == value) return;
+    _phoneControlConfirmationMode = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_phoneControlConfirmationModeKey, value.name);
+  }
+
+  PhoneControlConfirmationMode _parsePhoneControlConfirmationMode(String? raw) {
+    return PhoneControlConfirmationMode.values.firstWhere(
+      (mode) => mode.name == raw,
+      orElse: () => PhoneControlConfirmationMode.riskBased,
+    );
   }
 
   // Display: keep sidebar open when selecting assistant (mobile)

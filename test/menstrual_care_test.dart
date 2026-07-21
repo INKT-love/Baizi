@@ -192,4 +192,28 @@ void main() {
       expect(store.value, isNull);
     },
   );
+
+  test('refreshes profile changed by the background isolate', () async {
+    final store = _MemoryStore()
+      ..value = MenstrualCareProfile(
+        lastStartDate: DateTime(2026, 7, 1),
+        records: [MenstrualCycleRecord(startDate: DateTime(2026, 7, 1))],
+      );
+    final provider = MenstrualCareProvider(
+      store: store,
+      scheduler: _NoopScheduler(),
+    );
+    await provider.load();
+
+    store.value = store.value!.copyWith(
+      proactiveCareLastSuccessDay: '2026-07-03T00:00:00.000',
+    );
+    await provider.refreshProfileFromStore();
+
+    expect(
+      provider.profile!.proactiveCareLastSuccessDay,
+      '2026-07-03T00:00:00.000',
+    );
+    provider.dispose();
+  });
 }

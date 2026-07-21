@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import '../models/menstrual_care.dart';
@@ -27,7 +28,9 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   late final MenstrualCareProactiveService _proactiveService;
   MenstrualCareProfile? _profile;
   Timer? _proactiveTimer;
+  Timer? _profileSyncTimer;
   bool _proactiveRunInFlight = false;
+  bool _profileSyncInFlight = false;
   bool _loaded = false;
   bool get loaded => _loaded;
   MenstrualCareProfile? get profile => _profile;
@@ -51,6 +54,7 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
       // Reminder scheduling must never prevent private data from loading.
     }
     await _refreshProactiveCareSchedule(catchUp: true);
+    _startProfileSync();
     notifyListeners();
   }
 
@@ -203,8 +207,59 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(_runProactiveCareIfDue());
+      unawaited(_resumeProfileSync());
+    } else if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      _stopProfileSync();
     }
+  }
+
+  Future<void> _resumeProfileSync() async {
+    _startProfileSync();
+    await refreshProfileFromStore();
+    unawaited(_runProactiveCareIfDue());
+  }
+
+  /// Reloads state saved by the background WorkManager isolate.
+  ///
+  /// Secure storage has no cross-isolate change notification, so the visible
+  /// provider must occasionally reconcile its cached profile while foregrounded.
+  Future<void> refreshProfileFromStore() async {
+    if (_profileSyncInFlight) return;
+    _profileSyncInFlight = true;
+    try {
+      final savedProfile = await _store.read();
+      if (_profilesMatch(_profile, savedProfile)) return;
+      _profile = savedProfile;
+      _scheduleForegroundCare(savedProfile);
+      notifyListeners();
+    } catch (_) {
+      // Keep the last known state visible if secure storage is temporarily busy.
+    } finally {
+      _profileSyncInFlight = false;
+    }
+  }
+
+  void _startProfileSync() {
+    _profileSyncTimer ??= Timer.periodic(const Duration(seconds: 10), (_) {
+      unawaited(refreshProfileFromStore());
+    });
+  }
+
+  void _stopProfileSync() {
+    _profileSyncTimer?.cancel();
+    _profileSyncTimer = null;
+  }
+
+  bool _profilesMatch(
+    MenstrualCareProfile? first,
+    MenstrualCareProfile? second,
+  ) {
+    if (identical(first, second)) return true;
+    if (first == null || second == null) return false;
+    return jsonEncode(first.toJson()) == jsonEncode(second.toJson());
   }
 
   Future<void> _refreshProactiveCareSchedule({bool catchUp = false}) async {
@@ -291,6 +346,7 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _proactiveTimer?.cancel();
+    _stopProfileSync();
     super.dispose();
   }
 }

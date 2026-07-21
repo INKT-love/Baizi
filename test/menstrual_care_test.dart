@@ -99,6 +99,16 @@ void main() {
       ).shouldRun,
       isFalse,
     );
+    expect(
+      MenstrualCareProactiveLogic.evaluate(
+        active.copyWith(
+          proactiveCareLastAttemptDay: '2026-07-01T00:00:00.000',
+          proactiveCareLastError: '网络暂时不可用',
+        ),
+        now: DateTime(2026, 7, 1, 10),
+      ).shouldRun,
+      isTrue,
+    );
   });
 
   test('proactive care catches up after its configured time', () {

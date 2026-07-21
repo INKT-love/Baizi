@@ -1,5 +1,4 @@
 import '../models/menstrual_care.dart';
-import 'menstrual_care_calculator.dart';
 
 class MenstrualCareProactiveDecision {
   const MenstrualCareProactiveDecision({
@@ -40,7 +39,11 @@ class MenstrualCareProactiveLogic {
       );
     }
     final todayKey = today.toIso8601String();
-    if (profile.proactiveCareLastAttemptDay == todayKey) {
+    // A successful message is sent at most once per day. Failed attempts keep
+    // their error marker so the foreground timer and WorkManager can retry.
+    if (profile.proactiveCareLastSuccessDay == todayKey ||
+        (profile.proactiveCareLastAttemptDay == todayKey &&
+            profile.proactiveCareLastError == null)) {
       return const MenstrualCareProactiveDecision(
         shouldRun: false,
         isExpectedEndDay: false,

@@ -7,13 +7,19 @@ import 'menstrual_care_prompt_context.dart';
 import 'menstrual_care_store.dart';
 import 'menstrual_care_calculator.dart';
 
-enum MenstrualCareProactiveOutcome { sent, notDue, failed }
+enum MenstrualCareProactiveOutcome {
+  sent,
+  disabled,
+  noActivePeriod,
+  alreadySentToday,
+  alreadyAttemptedToday,
+  beforeScheduledTime,
+  failed,
+}
 
 class MenstrualCareProactiveService {
-  MenstrualCareProactiveService({
-    MenstrualCareStore? store,
-    this.chatService,
-  }) : _store = store ?? MenstrualCareStore();
+  MenstrualCareProactiveService({MenstrualCareStore? store, this.chatService})
+    : _store = store ?? MenstrualCareStore();
 
   final MenstrualCareStore _store;
   final ChatService? chatService;
@@ -22,15 +28,29 @@ class MenstrualCareProactiveService {
   /// background isolate and from the foreground catch-up path.
   Future<MenstrualCareProactiveOutcome> runIfDue({
     bool ignoreTime = false,
+    bool ignoreDailyLimit = false,
   }) async {
     final profile = await _store.read();
     final decision = MenstrualCareProactiveLogic.evaluate(
       profile,
       now: DateTime.now(),
       ignoreTime: ignoreTime,
+      ignoreDailyLimit: ignoreDailyLimit,
     );
     if (!decision.shouldRun || profile == null) {
-      return MenstrualCareProactiveOutcome.notDue;
+      return switch (decision.blockReason) {
+        MenstrualCareProactiveBlockReason.disabled =>
+          MenstrualCareProactiveOutcome.disabled,
+        MenstrualCareProactiveBlockReason.noActivePeriod =>
+          MenstrualCareProactiveOutcome.noActivePeriod,
+        MenstrualCareProactiveBlockReason.alreadySentToday =>
+          MenstrualCareProactiveOutcome.alreadySentToday,
+        MenstrualCareProactiveBlockReason.alreadyAttemptedToday =>
+          MenstrualCareProactiveOutcome.alreadyAttemptedToday,
+        MenstrualCareProactiveBlockReason.beforeScheduledTime =>
+          MenstrualCareProactiveOutcome.beforeScheduledTime,
+        null => MenstrualCareProactiveOutcome.disabled,
+      };
     }
     final today = dayOnly(DateTime.now()).toIso8601String();
     await _store.write(profile.copyWith(proactiveCareLastAttemptDay: today));

@@ -16,9 +16,7 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
     ChatService? chatService,
   }) : _store = store ?? MenstrualCareStore(),
        _scheduler = scheduler ?? MenstrualReminderScheduler() {
-    _proactiveService = MenstrualCareProactiveService(
-      chatService: chatService,
-    );
+    _proactiveService = MenstrualCareProactiveService(chatService: chatService);
     WidgetsFlutterBinding.ensureInitialized().addObserver(this);
     load();
   }
@@ -98,6 +96,7 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
     int? minutesOfDay,
     MenstrualCareDestination? destination,
     bool? allowMobileData,
+    bool? debugModeEnabled,
     String? conversationId,
     bool clearConversationId = false,
   }) async {
@@ -112,6 +111,7 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
         proactiveCareMinutes: minutes,
         proactiveCareDestination: destination,
         proactiveCareAllowMobileData: allowMobileData,
+        proactiveCareDebugModeEnabled: debugModeEnabled,
         proactiveCareConversationId: conversationId,
         clearProactiveCareConversationId: clearConversationId,
       ),
@@ -245,10 +245,14 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// Runs the configured care request immediately while preserving the
   /// in-period and once-per-day safeguards.
   Future<MenstrualCareProactiveOutcome?> runProactiveCareNow() =>
-      _runProactiveCare(ignoreTime: true);
+      _runProactiveCare(
+        ignoreTime: true,
+        ignoreDailyLimit: _profile?.proactiveCareDebugModeEnabled == true,
+      );
 
   Future<MenstrualCareProactiveOutcome?> _runProactiveCare({
     required bool ignoreTime,
+    bool ignoreDailyLimit = false,
   }) async {
     if (_proactiveRunInFlight || _profile?.proactiveCareEnabled != true) {
       return null;
@@ -257,6 +261,7 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
     try {
       final outcome = await _proactiveService.runIfDue(
         ignoreTime: ignoreTime,
+        ignoreDailyLimit: ignoreDailyLimit,
       );
       _profile = await _store.read();
       notifyListeners();

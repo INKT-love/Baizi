@@ -85,6 +85,7 @@ void main() {
       now: DateTime(2026, 7, 1, 9),
     );
     expect(firstDay.shouldRun, isTrue);
+    expect(firstDay.blockReason, isNull);
     expect(firstDay.isExpectedEndDay, isFalse);
     final endDay = MenstrualCareProactiveLogic.evaluate(
       active,
@@ -109,6 +110,21 @@ void main() {
       ).shouldRun,
       isTrue,
     );
+    final alreadySent = MenstrualCareProactiveLogic.evaluate(
+      active.copyWith(proactiveCareLastSuccessDay: '2026-07-01T00:00:00.000'),
+      now: DateTime(2026, 7, 1, 10),
+    );
+    expect(alreadySent.shouldRun, isFalse);
+    expect(
+      alreadySent.blockReason,
+      MenstrualCareProactiveBlockReason.alreadySentToday,
+    );
+    final debugRetry = MenstrualCareProactiveLogic.evaluate(
+      active.copyWith(proactiveCareLastSuccessDay: '2026-07-01T00:00:00.000'),
+      now: DateTime(2026, 7, 1, 10),
+      ignoreDailyLimit: true,
+    );
+    expect(debugRetry.shouldRun, isTrue);
   });
 
   test('proactive care catches up after its configured time', () {

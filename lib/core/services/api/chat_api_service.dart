@@ -15,7 +15,7 @@ import '../network/dio_http_client.dart';
 import '../network/request_logger.dart';
 import 'google_service_account_auth.dart';
 import '../../services/api_key_manager.dart';
-import 'package:Kelivo/secrets/fallback.dart';
+import 'package:Baizi/secrets/fallback.dart';
 import '../../../utils/markdown_media_sanitizer.dart';
 import '../../../utils/unicode_sanitizer.dart';
 import 'builtin_tools.dart';

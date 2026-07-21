@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:Kelivo/theme/app_font_weights.dart';
+import 'package:Baizi/theme/app_font_weights.dart';
 
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform;

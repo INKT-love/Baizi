@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-import 'package:Kelivo/core/config/baizi_gateway.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/api/chat_api_service.dart';
+import 'package:Baizi/core/config/baizi_gateway.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/api/chat_api_service.dart';
 
 void main() {
   test('routes non-Claude Baizi models through Responses API', () async {

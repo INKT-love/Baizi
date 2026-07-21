@@ -7,10 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/models/backup.dart';
-import 'package:Kelivo/core/services/backup/data_sync.dart';
-import 'package:Kelivo/core/services/chat/chat_service.dart';
-import 'package:Kelivo/utils/app_directories.dart';
+import 'package:Baizi/core/models/backup.dart';
+import 'package:Baizi/core/services/backup/data_sync.dart';
+import 'package:Baizi/core/services/chat/chat_service.dart';
+import 'package:Baizi/utils/app_directories.dart';
 
 class _FakePathProviderPlatform extends PathProviderPlatform {
   _FakePathProviderPlatform(this.root);

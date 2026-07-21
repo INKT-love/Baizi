@@ -5,14 +5,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/models/assistant_memory.dart';
-import 'package:Kelivo/core/providers/assistant_provider.dart';
-import 'package:Kelivo/core/providers/mcp_provider.dart';
-import 'package:Kelivo/core/providers/memory_provider.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/mcp/mcp_tool_service.dart';
-import 'package:Kelivo/features/home/services/tool_handler_service.dart';
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/models/assistant_memory.dart';
+import 'package:Baizi/core/providers/assistant_provider.dart';
+import 'package:Baizi/core/providers/mcp_provider.dart';
+import 'package:Baizi/core/providers/memory_provider.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/mcp/mcp_tool_service.dart';
+import 'package:Baizi/features/home/services/tool_handler_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

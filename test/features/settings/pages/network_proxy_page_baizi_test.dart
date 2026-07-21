@@ -1,7 +1,7 @@
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
-import 'package:Kelivo/features/settings/pages/network_proxy_page.dart';
-import 'package:Kelivo/l10n/app_localizations.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
+import 'package:Baizi/features/settings/pages/network_proxy_page.dart';
+import 'package:Baizi/l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/models/character_card.dart';
-import 'package:Kelivo/core/models/world_book.dart';
-import 'package:Kelivo/core/services/character_card/character_card_import_mapper.dart';
+import 'package:Baizi/core/models/character_card.dart';
+import 'package:Baizi/core/models/world_book.dart';
+import 'package:Baizi/core/services/character_card/character_card_import_mapper.dart';
 
 void main() {
   const mapper = CharacterCardImportMapper();

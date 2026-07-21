@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/models/chat_message.dart';
-import 'package:Kelivo/core/models/conversation.dart';
-import 'package:Kelivo/core/services/chat/chat_service.dart';
-import 'package:Kelivo/features/home/controllers/chat_controller.dart';
+import 'package:Baizi/core/models/chat_message.dart';
+import 'package:Baizi/core/models/conversation.dart';
+import 'package:Baizi/core/services/chat/chat_service.dart';
+import 'package:Baizi/features/home/controllers/chat_controller.dart';
 
 class _FakeLazyChatService extends ChatService {
   _FakeLazyChatService(this._messages);

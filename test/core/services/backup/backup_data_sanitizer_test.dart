@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/services/backup/backup_data_sanitizer.dart';
+import 'package:Baizi/core/services/backup/backup_data_sanitizer.dart';
 
 void main() {
   group('BackupDataSanitizer assistants_v1', () {

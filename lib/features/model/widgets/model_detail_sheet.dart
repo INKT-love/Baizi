@@ -13,7 +13,7 @@ import '../../../shared/widgets/ios_switch.dart';
 import '../../../shared/widgets/ios_tactile.dart';
 import '../../../shared/widgets/ios_tile_button.dart';
 import 'model_edit_state_helper.dart';
-import 'package:Kelivo/theme/app_font_weights.dart';
+import 'package:Baizi/theme/app_font_weights.dart';
 import '../../settings/pages/chat_appearance_page.dart';
 
 Future<bool?> showModelDetailSheet(

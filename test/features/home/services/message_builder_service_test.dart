@@ -3,15 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/models/chat_message.dart';
-import 'package:Kelivo/core/models/conversation.dart';
-import 'package:Kelivo/core/models/world_book.dart';
-import 'package:Kelivo/core/providers/user_provider.dart';
-import 'package:Kelivo/core/services/chat/chat_service.dart';
-import 'package:Kelivo/core/services/world_book_store.dart';
-import 'package:Kelivo/features/home/services/message_builder_service.dart';
-import 'package:Kelivo/l10n/app_localizations.dart';
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/models/chat_message.dart';
+import 'package:Baizi/core/models/conversation.dart';
+import 'package:Baizi/core/models/world_book.dart';
+import 'package:Baizi/core/providers/user_provider.dart';
+import 'package:Baizi/core/services/chat/chat_service.dart';
+import 'package:Baizi/core/services/world_book_store.dart';
+import 'package:Baizi/features/home/services/message_builder_service.dart';
+import 'package:Baizi/l10n/app_localizations.dart';
 
 class _FakeBuildContext implements BuildContext {
   @override

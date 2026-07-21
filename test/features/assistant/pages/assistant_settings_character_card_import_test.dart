@@ -6,17 +6,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/models/character_card.dart';
-import 'package:Kelivo/core/providers/assistant_provider.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/providers/world_book_provider.dart';
-import 'package:Kelivo/core/services/character_card/character_card_import_service.dart';
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
-import 'package:Kelivo/core/services/world_book_store.dart';
-import 'package:Kelivo/features/assistant/pages/assistant_settings_page.dart';
-import 'package:Kelivo/l10n/app_localizations.dart';
-import 'package:Kelivo/shared/widgets/snackbar.dart';
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/models/character_card.dart';
+import 'package:Baizi/core/providers/assistant_provider.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/providers/world_book_provider.dart';
+import 'package:Baizi/core/services/character_card/character_card_import_service.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
+import 'package:Baizi/core/services/world_book_store.dart';
+import 'package:Baizi/features/assistant/pages/assistant_settings_page.dart';
+import 'package:Baizi/l10n/app_localizations.dart';
+import 'package:Baizi/shared/widgets/snackbar.dart';
 
 class _FilePicker extends FilePicker {
   _FilePicker(this.path);

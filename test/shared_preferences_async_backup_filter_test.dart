@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/services/backup/data_sync.dart' as backup_sync;
+import 'package:Baizi/core/services/backup/data_sync.dart' as backup_sync;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

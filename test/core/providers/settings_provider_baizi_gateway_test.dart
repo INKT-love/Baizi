@@ -5,10 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/config/baizi_gateway.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/model_catalog_service.dart';
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
+import 'package:Baizi/core/config/baizi_gateway.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/model_catalog_service.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

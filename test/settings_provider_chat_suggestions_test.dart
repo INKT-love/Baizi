@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/config/baizi_gateway.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
+import 'package:Baizi/core/config/baizi_gateway.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
 
 Future<SettingsProvider> _settings(Map<String, Object> values) async {
   SharedPreferences.setMockInitialValues(values);

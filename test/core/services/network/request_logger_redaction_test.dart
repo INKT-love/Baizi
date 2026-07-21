@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/services/network/request_logger.dart';
+import 'package:Baizi/core/services/network/request_logger.dart';
 
 void main() {
   group('RequestLogger redaction', () {

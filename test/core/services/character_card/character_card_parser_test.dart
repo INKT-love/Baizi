@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/models/character_card.dart';
-import 'package:Kelivo/core/services/character_card/character_card_parser.dart';
+import 'package:Baizi/core/models/character_card.dart';
+import 'package:Baizi/core/services/character_card/character_card_parser.dart';
 
 Map<String, dynamic> _v1Card({Map<String, dynamic> extra = const {}}) => {
   ...extra,

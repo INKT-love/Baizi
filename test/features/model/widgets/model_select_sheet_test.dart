@@ -4,14 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/config/baizi_gateway.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
-import 'package:Kelivo/features/model/widgets/baizi_model_select_sheet.dart';
-import 'package:Kelivo/features/model/widgets/model_select_sheet.dart';
-import 'package:Kelivo/icons/lucide_adapter.dart';
-import 'package:Kelivo/l10n/app_localizations.dart';
-import 'package:Kelivo/shared/widgets/ios_tactile.dart';
+import 'package:Baizi/core/config/baizi_gateway.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
+import 'package:Baizi/features/model/widgets/baizi_model_select_sheet.dart';
+import 'package:Baizi/features/model/widgets/model_select_sheet.dart';
+import 'package:Baizi/icons/lucide_adapter.dart';
+import 'package:Baizi/l10n/app_localizations.dart';
+import 'package:Baizi/shared/widgets/ios_tactile.dart';
 
 const _cachedModelsKey = 'baizi_models_cache_v1';
 const _recentModelsKey = 'baizi_recent_models_v1';

@@ -9,7 +9,7 @@ import 'about_page.dart';
 import '../../backup/pages/backup_page.dart';
 import '../../stats/pages/stats_page.dart';
 import '../../../core/services/haptics.dart';
-import 'package:Kelivo/theme/app_font_weights.dart';
+import 'package:Baizi/theme/app_font_weights.dart';
 import '../../model/widgets/baizi_model_select_sheet.dart';
 import '../../setup/pages/baizi_setup_page.dart';
 import 'advanced_settings_page.dart';

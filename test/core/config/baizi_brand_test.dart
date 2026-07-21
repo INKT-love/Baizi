@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/config/baizi_brand.dart';
+import 'package:Baizi/core/config/baizi_brand.dart';
 
 void main() {
   test('uses the Baizi GitHub repository for brand links', () {

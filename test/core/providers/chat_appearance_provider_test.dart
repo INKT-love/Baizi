@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:Kelivo/core/models/chat_appearance.dart';
-import 'package:Kelivo/core/providers/chat_appearance_provider.dart';
+import 'package:Baizi/core/models/chat_appearance.dart';
+import 'package:Baizi/core/providers/chat_appearance_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

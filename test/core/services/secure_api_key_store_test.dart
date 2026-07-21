@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
 
 final class _MemoryBackend implements SecureApiKeyBackend {
   final Map<String, String> values = <String, String>{};

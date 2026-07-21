@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
-import 'package:Kelivo/features/settings/pages/baizi_api_key_manager_page.dart';
-import 'package:Kelivo/icons/lucide_adapter.dart';
-import 'package:Kelivo/l10n/app_localizations.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
+import 'package:Baizi/features/settings/pages/baizi_api_key_manager_page.dart';
+import 'package:Baizi/icons/lucide_adapter.dart';
+import 'package:Baizi/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

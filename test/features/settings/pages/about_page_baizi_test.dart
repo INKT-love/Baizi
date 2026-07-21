@@ -5,10 +5,10 @@ import 'package:http/testing.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
-import 'package:Kelivo/core/providers/update_provider.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/features/settings/pages/about_page.dart';
-import 'package:Kelivo/l10n/app_localizations.dart';
+import 'package:Baizi/core/providers/update_provider.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/features/settings/pages/about_page.dart';
+import 'package:Baizi/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

@@ -5,9 +5,9 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/models/character_card.dart';
-import 'package:Kelivo/core/services/character_card/character_card_parser.dart';
-import 'package:Kelivo/core/services/character_card/png_character_card_reader.dart';
+import 'package:Baizi/core/models/character_card.dart';
+import 'package:Baizi/core/services/character_card/character_card_parser.dart';
+import 'package:Baizi/core/services/character_card/png_character_card_reader.dart';
 
 const _pngSignature = <int>[137, 80, 78, 71, 13, 10, 26, 10];
 

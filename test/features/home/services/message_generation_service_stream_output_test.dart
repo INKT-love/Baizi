@@ -3,17 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/models/chat_message.dart';
-import 'package:Kelivo/core/providers/settings_provider.dart';
-import 'package:Kelivo/core/services/chat/chat_service.dart';
-import 'package:Kelivo/core/services/secure_api_key_store.dart';
-import 'package:Kelivo/features/home/controllers/chat_controller.dart';
-import 'package:Kelivo/features/home/controllers/generation_controller.dart';
-import 'package:Kelivo/features/home/controllers/stream_controller.dart'
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/models/chat_message.dart';
+import 'package:Baizi/core/providers/settings_provider.dart';
+import 'package:Baizi/core/services/chat/chat_service.dart';
+import 'package:Baizi/core/services/secure_api_key_store.dart';
+import 'package:Baizi/features/home/controllers/chat_controller.dart';
+import 'package:Baizi/features/home/controllers/generation_controller.dart';
+import 'package:Baizi/features/home/controllers/stream_controller.dart'
     as home_stream;
-import 'package:Kelivo/features/home/services/message_builder_service.dart';
-import 'package:Kelivo/features/home/services/message_generation_service.dart';
+import 'package:Baizi/features/home/services/message_builder_service.dart';
+import 'package:Baizi/features/home/services/message_generation_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

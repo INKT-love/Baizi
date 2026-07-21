@@ -12,15 +12,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ignore: depend_on_referenced_packages
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/models/assistant_character_data.dart';
-import 'package:Kelivo/core/models/character_card.dart';
-import 'package:Kelivo/core/models/world_book.dart';
-import 'package:Kelivo/core/providers/assistant_provider.dart';
-import 'package:Kelivo/core/providers/world_book_provider.dart';
-import 'package:Kelivo/core/services/character_card/character_card_import_service.dart';
-import 'package:Kelivo/core/services/character_card/character_card_parser.dart';
-import 'package:Kelivo/core/services/world_book_store.dart';
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/models/assistant_character_data.dart';
+import 'package:Baizi/core/models/character_card.dart';
+import 'package:Baizi/core/models/world_book.dart';
+import 'package:Baizi/core/providers/assistant_provider.dart';
+import 'package:Baizi/core/providers/world_book_provider.dart';
+import 'package:Baizi/core/services/character_card/character_card_import_service.dart';
+import 'package:Baizi/core/services/character_card/character_card_parser.dart';
+import 'package:Baizi/core/services/world_book_store.dart';
 
 class _FakePathProviderPlatform extends PathProviderPlatform {
   _FakePathProviderPlatform(this.path);

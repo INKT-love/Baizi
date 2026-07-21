@@ -182,12 +182,21 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
     if (!mounted) return;
     final message = switch (outcome) {
       MenstrualCareProactiveOutcome.sent => '已发送一条主动关怀到目标聊天。',
-      MenstrualCareProactiveOutcome.notDue => '当前没有进行中的经期，记录“今天开始”后才能发送。',
+      MenstrualCareProactiveOutcome.disabled => '请先开启主动经期关怀。',
+      MenstrualCareProactiveOutcome.noActivePeriod =>
+        '当前没有进行中的经期，记录“今天开始”后才能发送。',
+      MenstrualCareProactiveOutcome.alreadySentToday =>
+        '今天已发送过主动关怀。开启调试模式后可再次测试。',
+      MenstrualCareProactiveOutcome.alreadyAttemptedToday =>
+        '今天已有一条关怀正在生成，请稍后查看聊天。',
+      MenstrualCareProactiveOutcome.beforeScheduledTime => '尚未到设定的关怀时间。',
       MenstrualCareProactiveOutcome.failed =>
         care.profile?.proactiveCareLastError ?? '请求失败，请检查网络、API Key 和模型配置。',
       null => '正在生成上一条关怀，请稍后再试。',
     };
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _phase(MenstrualPhase phase) => switch (phase) {
@@ -324,6 +333,14 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
                 value: profile.proactiveCareAllowMobileData,
                 onChanged: (value) =>
                     care.updateProactiveCare(allowMobileData: value),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('调试模式'),
+                subtitle: const Text('仅允许“立即发送”重复测试，后台仍每天最多发送一次，可能消耗 API 额度'),
+                value: profile.proactiveCareDebugModeEnabled,
+                onChanged: (value) =>
+                    care.updateProactiveCare(debugModeEnabled: value),
               ),
               Align(
                 alignment: Alignment.centerLeft,

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/config/baizi_gateway.dart';
+import 'package:Baizi/core/config/baizi_gateway.dart';
 
 void main() {
   group('BaiziGateway', () {

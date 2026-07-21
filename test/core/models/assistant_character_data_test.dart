@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/models/assistant_character_data.dart';
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/models/assistant_character_data.dart';
 
 AssistantCharacterData _fullCharacterData() {
   return AssistantCharacterData(

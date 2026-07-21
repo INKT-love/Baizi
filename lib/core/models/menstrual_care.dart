@@ -49,6 +49,7 @@ class MenstrualCareProfile {
     this.proactiveCareMinutes = 540,
     this.proactiveCareDestination = MenstrualCareDestination.recentConversation,
     this.proactiveCareAllowMobileData = true,
+    this.proactiveCareDebugModeEnabled = false,
     this.proactiveCareConversationId,
     this.proactiveCareLastAttemptDay,
     this.proactiveCareLastSuccessDay,
@@ -68,6 +69,7 @@ class MenstrualCareProfile {
   final int proactiveCareMinutes;
   final MenstrualCareDestination proactiveCareDestination;
   final bool proactiveCareAllowMobileData;
+  final bool proactiveCareDebugModeEnabled;
   final String? proactiveCareConversationId;
   final String? proactiveCareLastAttemptDay;
   final String? proactiveCareLastSuccessDay;
@@ -88,6 +90,7 @@ class MenstrualCareProfile {
     int? proactiveCareMinutes,
     MenstrualCareDestination? proactiveCareDestination,
     bool? proactiveCareAllowMobileData,
+    bool? proactiveCareDebugModeEnabled,
     String? proactiveCareConversationId,
     bool clearProactiveCareConversationId = false,
     String? proactiveCareLastAttemptDay,
@@ -111,6 +114,8 @@ class MenstrualCareProfile {
         proactiveCareDestination ?? this.proactiveCareDestination,
     proactiveCareAllowMobileData:
         proactiveCareAllowMobileData ?? this.proactiveCareAllowMobileData,
+    proactiveCareDebugModeEnabled:
+        proactiveCareDebugModeEnabled ?? this.proactiveCareDebugModeEnabled,
     proactiveCareConversationId: clearProactiveCareConversationId
         ? null
         : (proactiveCareConversationId ?? this.proactiveCareConversationId),
@@ -138,6 +143,7 @@ class MenstrualCareProfile {
     'proactiveCareMinutes': proactiveCareMinutes,
     'proactiveCareDestination': proactiveCareDestination.name,
     'proactiveCareAllowMobileData': proactiveCareAllowMobileData,
+    'proactiveCareDebugModeEnabled': proactiveCareDebugModeEnabled,
     'proactiveCareConversationId': proactiveCareConversationId,
     'proactiveCareLastAttemptDay': proactiveCareLastAttemptDay,
     'proactiveCareLastSuccessDay': proactiveCareLastSuccessDay,
@@ -164,6 +170,8 @@ class MenstrualCareProfile {
       orElse: () => MenstrualCareDestination.recentConversation,
     ),
     proactiveCareAllowMobileData: json['proactiveCareAllowMobileData'] != false,
+    proactiveCareDebugModeEnabled:
+        json['proactiveCareDebugModeEnabled'] == true,
     proactiveCareConversationId: json['proactiveCareConversationId'] as String?,
     proactiveCareLastAttemptDay: json['proactiveCareLastAttemptDay'] as String?,
     proactiveCareLastSuccessDay: json['proactiveCareLastSuccessDay'] as String?,

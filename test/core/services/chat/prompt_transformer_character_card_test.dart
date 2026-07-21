@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/models/assistant_character_data.dart';
-import 'package:Kelivo/core/services/chat/prompt_transformer.dart';
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/models/assistant_character_data.dart';
+import 'package:Baizi/core/services/chat/prompt_transformer.dart';
 
 void main() {
   test('builds card prompt components without creating history messages', () {

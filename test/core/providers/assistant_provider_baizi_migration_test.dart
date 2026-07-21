@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Kelivo/core/config/baizi_gateway.dart';
-import 'package:Kelivo/core/models/assistant.dart';
-import 'package:Kelivo/core/providers/assistant_provider.dart';
+import 'package:Baizi/core/config/baizi_gateway.dart';
+import 'package:Baizi/core/models/assistant.dart';
+import 'package:Baizi/core/providers/assistant_provider.dart';
 
 Future<void> _waitUntil(bool Function() predicate) async {
   for (var attempt = 0; attempt < 100; attempt++) {

@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-import 'package:Kelivo/core/config/baizi_brand.dart';
-import 'package:Kelivo/core/providers/update_provider.dart';
+import 'package:Baizi/core/config/baizi_brand.dart';
+import 'package:Baizi/core/providers/update_provider.dart';
 
 void main() {
   group('UpdateProvider Baizi release source isolation', () {

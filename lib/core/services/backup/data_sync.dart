@@ -720,6 +720,7 @@ class DataSync {
               'world_books_v1', // World book entries
               'world_books_active_ids_by_assistant_v1', // assistantId -> bookIds
               'world_books_collapsed_v1', // bookId -> bool
+              'chat_appearance_profiles_v1', // modelId -> chat appearance
             };
             const credentialListKeys = {
               'search_services_v1',

@@ -14,6 +14,7 @@ import '../../../shared/widgets/ios_tactile.dart';
 import '../../../shared/widgets/ios_tile_button.dart';
 import 'model_edit_state_helper.dart';
 import 'package:Kelivo/theme/app_font_weights.dart';
+import '../../settings/pages/chat_appearance_page.dart';
 
 Future<bool?> showModelDetailSheet(
   BuildContext context, {
@@ -394,6 +395,23 @@ class _ModelDetailSheetState extends State<_ModelDetailSheet>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!widget.isNew) ...[
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Lucide.Image),
+                title: const Text('聊天外观'),
+                subtitle: const Text('设置该模型的昵称、头像和聊天背景'),
+                trailing: const Icon(Lucide.ChevronRight),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        ChatAppearancePage(initialModelId: widget.modelId),
+                  ),
+                ),
+              ),
+              const Divider(height: 1),
+              const SizedBox(height: 12),
+            ],
             _label(context, l10n.modelDetailSheetModelIdLabel),
             const SizedBox(height: 6),
             TextField(

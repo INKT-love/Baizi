@@ -16,6 +16,8 @@ import '../../../theme/app_font_weights.dart';
 import '../../../theme/design_tokens.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/providers/assistant_provider.dart';
+import '../../../core/providers/chat_appearance_provider.dart';
+import '../../../core/models/chat_appearance.dart';
 import '../../../core/providers/quick_phrase_provider.dart';
 import '../../../core/providers/instruction_injection_provider.dart';
 import '../../../core/providers/world_book_provider.dart';
@@ -966,14 +968,11 @@ class _HomePageState extends State<HomePage>
   Widget _buildChatBackground(BuildContext context, ColorScheme cs) {
     return Builder(
       builder: (context) {
-        final bg = context
-            .watch<AssistantProvider>()
-            .currentAssistant
-            ?.background;
+        final bg = _chatBackgroundRaw(context);
         final maskStrength = context
             .watch<SettingsProvider>()
             .chatBackgroundMaskStrength;
-        if (bg == null || bg.trim().isEmpty) return const SizedBox.shrink();
+        if (bg.trim().isEmpty) return const SizedBox.shrink();
         ImageProvider provider;
         if (bg.startsWith('http')) {
           provider = NetworkImage(bg);
@@ -1027,8 +1026,7 @@ class _HomePageState extends State<HomePage>
 
   Widget _buildAssistantBackground(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final assistant = context.watch<AssistantProvider>().currentAssistant;
-    final bgRaw = (assistant?.background ?? '').trim();
+    final bgRaw = _chatBackgroundRaw(context).trim();
     Widget? bg;
     if (bgRaw.isNotEmpty) {
       if (bgRaw.startsWith('http')) {
@@ -1071,9 +1069,7 @@ class _HomePageState extends State<HomePage>
   }
 
   bool _assistantBackgroundActive(BuildContext context) {
-    final bgRaw =
-        (context.watch<AssistantProvider>().currentAssistant?.background ?? '')
-            .trim();
+    final bgRaw = _chatBackgroundRaw(context).trim();
     if (bgRaw.isEmpty) return false;
     if (bgRaw.startsWith('http')) return true;
     try {
@@ -1082,6 +1078,42 @@ class _HomePageState extends State<HomePage>
     } catch (_) {
       return false;
     }
+  }
+
+  String _chatBackgroundRaw(BuildContext context) {
+    final appearance = context.watch<ChatAppearanceProvider>();
+    final modelId = _backgroundModelId(context, appearance.backgroundMode);
+    final modelBackground = appearance
+        .profileFor(modelId)
+        ?.backgroundPath
+        ?.trim();
+    if (modelBackground != null && modelBackground.isNotEmpty) {
+      return modelBackground;
+    }
+    // Preserve existing character-card backgrounds until the model has one.
+    return context.watch<AssistantProvider>().currentAssistant?.background ??
+        '';
+  }
+
+  String? _backgroundModelId(BuildContext context, ChatBackgroundMode mode) {
+    if (mode == ChatBackgroundMode.latestAssistantReply) {
+      for (final message
+          in _controller.collapseVersions(_controller.messages).reversed) {
+        final modelId = message.role == 'assistant'
+            ? message.modelId?.trim()
+            : null;
+        if (modelId != null && modelId.isNotEmpty) return modelId;
+      }
+    }
+    final assistantModelId = context
+        .watch<AssistantProvider>()
+        .currentAssistant
+        ?.chatModelId
+        ?.trim();
+    if (assistantModelId != null && assistantModelId.isNotEmpty) {
+      return assistantModelId;
+    }
+    return context.watch<SettingsProvider>().currentModelId;
   }
 
   double _chatTopOverlayInset(BuildContext context) {

@@ -18,6 +18,7 @@ import '../../../shared/widgets/ios_switch.dart';
 import '../../../core/services/haptics.dart';
 import 'package:file_picker/file_picker.dart';
 import 'google_fonts_picker_page.dart';
+import 'chat_appearance_page.dart';
 import 'package:Kelivo/theme/app_font_weights.dart';
 
 enum _FontTarget { app, code }
@@ -113,6 +114,16 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
                   MaterialPageRoute(
                     builder: (_) => const ChatItemDisplaySettingsPage(),
                   ),
+                ),
+              ),
+              _iosDivider(context),
+              _iosNavRow(
+                context,
+                icon: Lucide.Image,
+                label: '聊天外观',
+                detailText: '头像、昵称和模型背景',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ChatAppearancePage()),
                 ),
               ),
               _iosDivider(context),

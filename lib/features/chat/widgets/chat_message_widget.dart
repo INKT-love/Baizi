@@ -19,6 +19,7 @@ import '../../../icons/lucide_adapter.dart';
 import '../../../icons/reasoning_icons.dart';
 // import '../../../theme/design_tokens.dart';
 import '../../../core/providers/user_provider.dart';
+import '../../../core/providers/chat_appearance_provider.dart';
 import '../../../core/services/chat/chat_service.dart';
 import '../../../core/providers/assistant_provider.dart';
 import 'package:intl/intl.dart';
@@ -1000,6 +1001,18 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
       return '$displayName | $providerName';
     }
     return displayName;
+  }
+
+  String? _appearanceModelId(SettingsProvider settings, Assistant? assistant) {
+    final messageModelId = widget.message.modelId?.trim();
+    if (messageModelId != null && messageModelId.isNotEmpty) {
+      return messageModelId;
+    }
+    final assistantModelId = assistant?.chatModelId?.trim();
+    if (assistantModelId != null && assistantModelId.isNotEmpty) {
+      return assistantModelId;
+    }
+    return settings.currentModelId;
   }
 
   @override
@@ -2087,6 +2100,22 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
     final l10n = AppLocalizations.of(context)!;
     final settings = context.watch<SettingsProvider>();
     final assistant = _assistantForMessage();
+    final modelAppearance = context.watch<ChatAppearanceProvider>().profileFor(
+      _appearanceModelId(settings, assistant),
+    );
+    final appearanceName = modelAppearance?.nickname?.trim();
+    final effectiveName = appearanceName != null && appearanceName.isNotEmpty
+        ? appearanceName
+        : (widget.useAssistantName
+              ? (widget.assistantName?.trim().isNotEmpty == true
+                    ? widget.assistantName!.trim()
+                    : _assistantNameFallback())
+              : _resolveModelDisplayName(settings));
+    final appearanceAvatar = modelAppearance?.avatarPath?.trim();
+    final effectiveAvatar =
+        appearanceAvatar != null && appearanceAvatar.isNotEmpty
+        ? appearanceAvatar
+        : widget.assistantAvatar;
 
     final parsedInlineThinking = _legacyInlineThinkingFor(widget);
     final extractedThinking = parsedInlineThinking.thinkingTexts.join('\n\n');
@@ -2120,8 +2149,12 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
           // Header: Model info and time
           Row(
             children: [
-              if (widget.useAssistantAvatar) ...[
-                _buildAssistantAvatar(cs),
+              if ((effectiveAvatar ?? '').trim().isNotEmpty) ...[
+                _buildAssistantAvatar(
+                  cs,
+                  avatar: effectiveAvatar,
+                  displayName: effectiveName,
+                ),
                 const SizedBox(width: 8),
               ] else if (widget.showModelIcon) ...[
                 widget.modelIcon ??
@@ -2142,11 +2175,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
                   children: [
                     if (settings.showModelName)
                       Text(
-                        widget.useAssistantName
-                            ? (widget.assistantName?.trim().isNotEmpty == true
-                                  ? widget.assistantName!.trim()
-                                  : _assistantNameFallback())
-                            : _resolveModelDisplayName(settings),
+                        effectiveName,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
@@ -2830,8 +2859,12 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
     }
   }
 
-  Widget _buildAssistantAvatar(ColorScheme cs) {
-    final av = (widget.assistantAvatar ?? '').trim();
+  Widget _buildAssistantAvatar(
+    ColorScheme cs, {
+    String? avatar,
+    String? displayName,
+  }) {
+    final av = (avatar ?? widget.assistantAvatar ?? '').trim();
     if (av.isNotEmpty) {
       if (av.startsWith('http')) {
         return FutureBuilder<String?>(
@@ -2854,7 +2887,8 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
                 width: 32,
                 height: 32,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _assistantInitial(cs),
+                errorBuilder: (_, __, ___) =>
+                    _assistantInitial(cs, displayName),
               ),
             );
           },
@@ -2868,7 +2902,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
             child: Image.file(f, width: 32, height: 32, fit: BoxFit.cover),
           );
         }
-        return _assistantInitial(cs);
+        return _assistantInitial(cs, displayName);
       }
       // treat as emoji or single char label
       final bool isIOS = defaultTargetPlatform == TargetPlatform.iOS;
@@ -2890,11 +2924,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget> {
         ),
       );
     }
-    return _assistantInitial(cs);
+    return _assistantInitial(cs, displayName);
   }
 
-  Widget _assistantInitial(ColorScheme cs) {
-    final name = (widget.assistantName ?? '').trim();
+  Widget _assistantInitial(ColorScheme cs, [String? displayName]) {
+    final name = (displayName ?? widget.assistantName ?? '').trim();
     final ch = name.isNotEmpty ? name.characters.first.toUpperCase() : 'A';
     return Container(
       width: 32,

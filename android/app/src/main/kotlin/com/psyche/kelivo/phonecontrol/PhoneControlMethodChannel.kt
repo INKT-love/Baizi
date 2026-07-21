@@ -7,6 +7,7 @@ import android.accessibilityservice.AccessibilityService
 import android.provider.Settings
 import rikka.shizuku.Shizuku
 import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import java.io.BufferedReader
 import java.io.File
@@ -16,16 +17,53 @@ import java.util.concurrent.TimeUnit
 
 object PhoneControlMethodChannel {
     private const val CHANNEL = "baizi.phone_control"
+    private const val EVENTS_CHANNEL = "baizi.phone_control.events"
     private const val SHIZUKU_REQUEST = 9182
     private val executor = Executors.newSingleThreadExecutor()
+    private var eventSink: EventChannel.EventSink? = null
+    private var authorizationPending = false
+
+    private val permissionResultListener =
+        Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+            if (requestCode != SHIZUKU_REQUEST) return@OnRequestPermissionResultListener
+            authorizationPending = false
+            eventSink?.success(
+                status("granted".takeIf { grantResult == PackageManager.PERMISSION_GRANTED }
+                    ?: "denied"),
+            )
+        }
 
     fun install(context: Context, messenger: BinaryMessenger) {
+        Shizuku.addRequestPermissionResultListener(permissionResultListener)
+        EventChannel(messenger, EVENTS_CHANNEL).setStreamHandler(
+            object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    eventSink = events
+                    events?.success(status())
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    eventSink = null
+                }
+            },
+        )
         MethodChannel(messenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "getStatus" -> result.success(status())
                 "requestShizuku" -> {
-                    try { Shizuku.requestPermission(SHIZUKU_REQUEST); result.success(true) }
-                    catch (e: Throwable) { result.error("shizuku_request_failed", e.message, null) }
+                    when {
+                        !isShizukuRunning() -> result.success(status("not_running"))
+                        hasShizukuPermission() -> result.success(status("already_granted"))
+                        authorizationPending -> result.success(status("pending"))
+                        else -> try {
+                            authorizationPending = true
+                            Shizuku.requestPermission(SHIZUKU_REQUEST)
+                            result.success(status("pending"))
+                        } catch (e: Throwable) {
+                            authorizationPending = false
+                            result.success(status("request_failed", e.message))
+                        }
+                    }
                 }
                 "openAccessibilitySettings" -> {
                     context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -43,12 +81,28 @@ object PhoneControlMethodChannel {
         }
     }
 
-    private fun status(): Map<String, Any?> {
-        val shizukuRunning = try { Shizuku.pingBinder() } catch (_: Throwable) { false }
-        val shizukuGranted = shizukuRunning && try { Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED } catch (_: Throwable) { false }
-        return mapOf("shizukuRunning" to shizukuRunning, "shizukuGranted" to shizukuGranted,
-            "rootAvailable" to rootAvailable(), "accessibilityEnabled" to (PhoneControlAccessibilityService.instance != null))
+    private fun status(
+        authorizationState: String? = null,
+        authorizationMessage: String? = null,
+    ): Map<String, Any?> {
+        val shizukuRunning = isShizukuRunning()
+        val shizukuGranted = shizukuRunning && hasShizukuPermission()
+        return mapOf(
+            "shizukuRunning" to shizukuRunning,
+            "shizukuGranted" to shizukuGranted,
+            "shizukuAuthorizationState" to (
+                authorizationState ?: if (shizukuGranted) "granted" else if (authorizationPending) "pending" else "idle"
+            ),
+            "shizukuAuthorizationMessage" to authorizationMessage,
+            "rootAvailable" to rootAvailable(),
+            "accessibilityEnabled" to (PhoneControlAccessibilityService.instance != null),
+        )
     }
+
+    private fun isShizukuRunning(): Boolean = try { Shizuku.pingBinder() } catch (_: Throwable) { false }
+    private fun hasShizukuPermission(): Boolean = try {
+        Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+    } catch (_: Throwable) { false }
 
     private fun execute(context: Context, args: Map<String, Any?>): Map<String, Any?> {
         val action = args["action"]?.toString()?.trim().orEmpty()

@@ -10,6 +10,7 @@ class PhoneControlService {
   PhoneControlService._();
 
   static const _channel = MethodChannel('baizi.phone_control');
+  static const _events = EventChannel('baizi.phone_control.events');
   static const toolName = 'phone_control';
 
   static bool get isSupported => Platform.isAndroid;
@@ -131,8 +132,17 @@ class PhoneControlService {
     return {'supported': true, ...?result};
   }
 
-  static Future<void> requestShizuku() =>
-      _channel.invokeMethod('requestShizuku');
+  static Stream<Map<String, dynamic>> get statusEvents => _events
+      .receiveBroadcastStream()
+      .map((event) => Map<String, dynamic>.from(event as Map));
+
+  static Future<Map<String, dynamic>> requestShizuku() async {
+    final result = await _channel.invokeMapMethod<String, dynamic>(
+      'requestShizuku',
+    );
+    return Map<String, dynamic>.from(result ?? const <String, dynamic>{});
+  }
+
   static Future<void> openAccessibilitySettings() =>
       _channel.invokeMethod('openAccessibilitySettings');
 

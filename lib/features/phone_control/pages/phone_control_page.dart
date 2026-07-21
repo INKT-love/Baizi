@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,14 +15,32 @@ class PhoneControlPage extends StatefulWidget {
   State<PhoneControlPage> createState() => _PhoneControlPageState();
 }
 
-class _PhoneControlPageState extends State<PhoneControlPage> {
+class _PhoneControlPageState extends State<PhoneControlPage>
+    with WidgetsBindingObserver {
   Map<String, dynamic>? _status;
   bool _checking = false;
+  StreamSubscription<Map<String, dynamic>>? _statusSubscription;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _statusSubscription = PhoneControlService.statusEvents.listen((status) {
+      if (mounted) setState(() => _status = status);
+    });
     _refresh();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _statusSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) unawaited(_refresh());
   }
 
   Future<void> _refresh() async {
@@ -124,8 +143,8 @@ class _PhoneControlPageState extends State<PhoneControlPage> {
               subtitle: const Text('优先使用，适合大多数系统操作'),
               trailing: const Icon(Lucide.ChevronRight),
               onTap: () async {
-                await PhoneControlService.requestShizuku();
-                await _refresh();
+                final result = await PhoneControlService.requestShizuku();
+                if (mounted) setState(() => _status = result);
               },
             ),
             const Divider(height: 1),
@@ -190,6 +209,21 @@ class _PhoneControlPageState extends State<PhoneControlPage> {
               '白子会优先使用 Shizuku，Root 作为补充；无障碍服务用于读取当前界面、点击、输入和滚动。锁屏、支付验证和系统保护页会暂停等待你接手。',
             ),
           ),
+          if (status['shizukuAuthorizationState'] == 'pending')
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Text('正在等待 Shizuku 授权，请在弹窗中允许。'),
+            ),
+          if (status['shizukuAuthorizationState'] == 'denied' ||
+              status['shizukuAuthorizationState'] == 'request_failed')
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Text(
+                status['shizukuAuthorizationState'] == 'denied'
+                    ? 'Shizuku 授权被拒绝，请重新连接。'
+                    : '无法发起 Shizuku 授权：${status['shizukuAuthorizationMessage'] ?? '请确认 Shizuku 已运行'}',
+              ),
+            ),
         ],
       ),
     );

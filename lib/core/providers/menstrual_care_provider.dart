@@ -239,10 +239,25 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _runProactiveCareIfDue() async {
-    if (_proactiveRunInFlight || _profile?.proactiveCareEnabled != true) return;
+    await _runProactiveCare(ignoreTime: false);
+  }
+
+  /// Runs the configured care request immediately while preserving the
+  /// in-period and once-per-day safeguards.
+  Future<MenstrualCareProactiveOutcome?> runProactiveCareNow() =>
+      _runProactiveCare(ignoreTime: true);
+
+  Future<MenstrualCareProactiveOutcome?> _runProactiveCare({
+    required bool ignoreTime,
+  }) async {
+    if (_proactiveRunInFlight || _profile?.proactiveCareEnabled != true) {
+      return null;
+    }
     _proactiveRunInFlight = true;
     try {
-      final outcome = await _proactiveService.runIfDue();
+      final outcome = await _proactiveService.runIfDue(
+        ignoreTime: ignoreTime,
+      );
       _profile = await _store.read();
       notifyListeners();
       if (outcome == MenstrualCareProactiveOutcome.failed) {
@@ -255,11 +270,13 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
       } else {
         await _refreshProactiveCareSchedule();
       }
+      return outcome;
     } catch (_) {
       _proactiveTimer?.cancel();
       _proactiveTimer = Timer(const Duration(minutes: 15), () {
         unawaited(_runProactiveCareIfDue());
       });
+      return null;
     } finally {
       _proactiveRunInFlight = false;
     }

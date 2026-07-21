@@ -20,11 +20,14 @@ class MenstrualCareProactiveService {
 
   /// Generates one due care message. This is safe to call from Android's
   /// background isolate and from the foreground catch-up path.
-  Future<MenstrualCareProactiveOutcome> runIfDue() async {
+  Future<MenstrualCareProactiveOutcome> runIfDue({
+    bool ignoreTime = false,
+  }) async {
     final profile = await _store.read();
     final decision = MenstrualCareProactiveLogic.evaluate(
       profile,
       now: DateTime.now(),
+      ignoreTime: ignoreTime,
     );
     if (!decision.shouldRun || profile == null) {
       return MenstrualCareProactiveOutcome.notDue;

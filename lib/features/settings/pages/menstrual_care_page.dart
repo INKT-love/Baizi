@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/menstrual_care_provider.dart';
 import '../../../core/models/menstrual_care.dart';
+import '../../../core/services/menstrual_care_proactive_service.dart';
 import '../../../l10n/app_localizations.dart';
 
 class MenstrualCarePage extends StatefulWidget {
@@ -176,6 +177,19 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
     );
   }
 
+  Future<void> _runProactiveCareNow(MenstrualCareProvider care) async {
+    final outcome = await care.runProactiveCareNow();
+    if (!mounted) return;
+    final message = switch (outcome) {
+      MenstrualCareProactiveOutcome.sent => '已发送一条主动关怀到目标聊天。',
+      MenstrualCareProactiveOutcome.notDue => '当前没有进行中的经期，记录“今天开始”后才能发送。',
+      MenstrualCareProactiveOutcome.failed =>
+        care.profile?.proactiveCareLastError ?? '请求失败，请检查网络、API Key 和模型配置。',
+      null => '正在生成上一条关怀，请稍后再试。',
+    };
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   String _phase(MenstrualPhase phase) => switch (phase) {
     MenstrualPhase.period => '经期中',
     MenstrualPhase.postPeriod => '经期后',
@@ -310,6 +324,14 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
                 value: profile.proactiveCareAllowMobileData,
                 onChanged: (value) =>
                     care.updateProactiveCare(allowMobileData: value),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton.icon(
+                  onPressed: () => _runProactiveCareNow(care),
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('立即发送一次关怀'),
+                ),
               ),
               if (profile.proactiveCareLastSuccessDay != null)
                 Padding(

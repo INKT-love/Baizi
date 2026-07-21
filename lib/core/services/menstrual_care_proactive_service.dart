@@ -10,10 +10,13 @@ import 'menstrual_care_calculator.dart';
 enum MenstrualCareProactiveOutcome { sent, notDue, failed }
 
 class MenstrualCareProactiveService {
-  MenstrualCareProactiveService({MenstrualCareStore? store})
-    : _store = store ?? MenstrualCareStore();
+  MenstrualCareProactiveService({
+    MenstrualCareStore? store,
+    this.chatService,
+  }) : _store = store ?? MenstrualCareStore();
 
   final MenstrualCareStore _store;
+  final ChatService? chatService;
 
   /// Generates one due care message. This is safe to call from Android's
   /// background isolate and from the foreground catch-up path.
@@ -35,9 +38,12 @@ class MenstrualCareProactiveService {
       if (modelId == null || modelId.isEmpty) {
         throw StateError('No selected model');
       }
-      final chatService = ChatService();
-      await chatService.init();
-      final destination = await _resolveDestination(chatService, profile);
+      // Foreground care receives the app's existing ChatService so its reply
+      // immediately reaches the visible conversation. A headless WorkManager
+      // isolate has no such instance and safely opens its own local service.
+      final activeChatService = chatService ?? ChatService();
+      await activeChatService.init();
+      final destination = await _resolveDestination(activeChatService, profile);
       if (destination == null) throw StateError('No eligible conversation');
       final context = MenstrualCarePromptContext.build(
         profile,
@@ -62,7 +68,7 @@ class MenstrualCareProactiveService {
       }
       final reply = content.toString().trim();
       if (reply.isEmpty) throw StateError('Empty proactive reply');
-      await chatService.addMessage(
+      await activeChatService.addMessage(
         conversationId: destination.id,
         role: 'assistant',
         content: reply,

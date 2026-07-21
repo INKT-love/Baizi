@@ -5,6 +5,7 @@ import '../models/menstrual_care.dart';
 import '../services/menstrual_care_calculator.dart';
 import '../services/menstrual_care_proactive_service.dart';
 import '../services/menstrual_care_store.dart';
+import '../services/chat/chat_service.dart';
 import '../services/menstrual_reminder_scheduler.dart';
 import '../services/menstrual_care_proactive_scheduler.dart';
 
@@ -12,8 +13,12 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   MenstrualCareProvider({
     MenstrualCareStore? store,
     MenstrualReminderScheduler? scheduler,
+    ChatService? chatService,
   }) : _store = store ?? MenstrualCareStore(),
        _scheduler = scheduler ?? MenstrualReminderScheduler() {
+    _proactiveService = MenstrualCareProactiveService(
+      chatService: chatService,
+    );
     WidgetsFlutterBinding.ensureInitialized().addObserver(this);
     load();
   }
@@ -21,8 +26,7 @@ class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   final MenstrualReminderScheduler _scheduler;
   final MenstrualCareProactiveScheduler _proactiveScheduler =
       MenstrualCareProactiveScheduler();
-  final MenstrualCareProactiveService _proactiveService =
-      MenstrualCareProactiveService();
+  late final MenstrualCareProactiveService _proactiveService;
   MenstrualCareProfile? _profile;
   Timer? _proactiveTimer;
   bool _proactiveRunInFlight = false;

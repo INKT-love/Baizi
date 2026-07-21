@@ -157,7 +157,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (_) => MemoryProvider()),
         ChangeNotifierProvider(create: (_) => BackupReminderProvider()),
-        ChangeNotifierProvider(create: (_) => MenstrualCareProvider()),
+        ChangeNotifierProvider(
+          lazy: false,
+          create: (context) => MenstrualCareProvider(
+            chatService: context.read<ChatService>(),
+          ),
+        ),
         // Desktop hotkeys provider
         ChangeNotifierProvider(create: (_) => HotkeyProvider()),
         ChangeNotifierProvider(

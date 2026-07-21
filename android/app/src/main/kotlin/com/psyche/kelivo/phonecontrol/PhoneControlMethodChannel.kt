@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.accessibilityservice.AccessibilityService
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import rikka.shizuku.Shizuku
 import io.flutter.plugin.common.BinaryMessenger
@@ -20,21 +22,38 @@ object PhoneControlMethodChannel {
     private const val EVENTS_CHANNEL = "baizi.phone_control.events"
     private const val SHIZUKU_REQUEST = 9182
     private val executor = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
     private var eventSink: EventChannel.EventSink? = null
     private var authorizationPending = false
+    private var listenersInstalled = false
+
+    private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
+        authorizationPending = false
+        emitStatus(if (hasShizukuPermission()) "granted" else "idle")
+    }
+
+    private val binderDeadListener = Shizuku.OnBinderDeadListener {
+        authorizationPending = false
+        emitStatus("not_running")
+    }
 
     private val permissionResultListener =
         Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
             if (requestCode != SHIZUKU_REQUEST) return@OnRequestPermissionResultListener
             authorizationPending = false
-            eventSink?.success(
-                status("granted".takeIf { grantResult == PackageManager.PERMISSION_GRANTED }
-                    ?: "denied"),
+            emitStatus(
+                "granted".takeIf { grantResult == PackageManager.PERMISSION_GRANTED }
+                    ?: "denied",
             )
         }
 
     fun install(context: Context, messenger: BinaryMessenger) {
-        Shizuku.addRequestPermissionResultListener(permissionResultListener)
+        if (!listenersInstalled) {
+            listenersInstalled = true
+            Shizuku.addBinderReceivedListenerSticky(binderReceivedListener)
+            Shizuku.addBinderDeadListener(binderDeadListener)
+            Shizuku.addRequestPermissionResultListener(permissionResultListener)
+        }
         EventChannel(messenger, EVENTS_CHANNEL).setStreamHandler(
             object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -97,6 +116,12 @@ object PhoneControlMethodChannel {
             "rootAvailable" to rootAvailable(),
             "accessibilityEnabled" to (PhoneControlAccessibilityService.instance != null),
         )
+    }
+
+    private fun emitStatus(authorizationState: String, message: String? = null) {
+        mainHandler.post {
+            eventSink?.success(status(authorizationState, message))
+        }
     }
 
     private fun isShizukuRunning(): Boolean = try { Shizuku.pingBinder() } catch (_: Throwable) { false }

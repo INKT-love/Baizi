@@ -19,6 +19,9 @@ class _PhoneControlPageState extends State<PhoneControlPage>
     with WidgetsBindingObserver {
   Map<String, dynamic>? _status;
   bool _checking = false;
+  bool _refreshInFlight = false;
+  Timer? _authorizationPollTimer;
+  int _authorizationPollCount = 0;
   StreamSubscription<Map<String, dynamic>>? _statusSubscription;
 
   @override
@@ -26,7 +29,11 @@ class _PhoneControlPageState extends State<PhoneControlPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _statusSubscription = PhoneControlService.statusEvents.listen((status) {
-      if (mounted) setState(() => _status = status);
+      if (!mounted) return;
+      setState(() => _status = status);
+      if (status['shizukuGranted'] == true) {
+        _stopAuthorizationPolling();
+      }
     });
     _refresh();
   }
@@ -34,22 +41,58 @@ class _PhoneControlPageState extends State<PhoneControlPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _stopAuthorizationPolling();
     _statusSubscription?.cancel();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) unawaited(_refresh());
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_refresh());
+      if (_status?['shizukuGranted'] != true) {
+        _startAuthorizationPolling();
+      }
+    }
   }
 
-  Future<void> _refresh() async {
-    setState(() => _checking = true);
+  Future<void> _refresh({bool showProgress = true}) async {
+    if (_refreshInFlight) return;
+    _refreshInFlight = true;
+    if (showProgress && mounted) setState(() => _checking = true);
     try {
-      _status = await PhoneControlService.getStatus();
+      final status = await PhoneControlService.getStatus();
+      if (!mounted) return;
+      setState(() => _status = status);
+      if (status['shizukuGranted'] == true) {
+        _stopAuthorizationPolling();
+      }
     } finally {
-      if (mounted) setState(() => _checking = false);
+      _refreshInFlight = false;
+      if (showProgress && mounted) setState(() => _checking = false);
     }
+  }
+
+  void _startAuthorizationPolling() {
+    _authorizationPollCount = 0;
+    _authorizationPollTimer?.cancel();
+    _authorizationPollTimer = Timer.periodic(
+      const Duration(milliseconds: 800),
+      (timer) {
+        _authorizationPollCount++;
+        if (_authorizationPollCount >= 20 ||
+            _status?['shizukuGranted'] == true) {
+          _stopAuthorizationPolling();
+          return;
+        }
+        unawaited(_refresh(showProgress: false));
+      },
+    );
+  }
+
+  void _stopAuthorizationPolling() {
+    _authorizationPollTimer?.cancel();
+    _authorizationPollTimer = null;
   }
 
   Future<void> _setEnabled(bool value) async {
@@ -113,6 +156,8 @@ class _PhoneControlPageState extends State<PhoneControlPage>
       return const Scaffold(body: Center(child: Text('手机控制仅支持 Android。')));
     }
     final status = _status ?? const <String, dynamic>{};
+    final authorizationState =
+        status['shizukuAuthorizationState']?.toString() ?? 'idle';
     return Scaffold(
       appBar: AppBar(title: const Text('手机控制')),
       body: ListView(
@@ -132,8 +177,12 @@ class _PhoneControlPageState extends State<PhoneControlPage>
               'Shizuku（推荐）',
               status['shizukuGranted'] == true
                   ? '已授权'
-                  : status['shizukuRunning'] == true
+                  : authorizationState == 'pending'
                   ? '等待授权'
+                  : authorizationState == 'denied'
+                  ? '已拒绝'
+                  : status['shizukuRunning'] == true
+                  ? '未授权'
                   : '未运行',
               status['shizukuGranted'] == true,
             ),
@@ -143,8 +192,20 @@ class _PhoneControlPageState extends State<PhoneControlPage>
               subtitle: const Text('优先使用，适合大多数系统操作'),
               trailing: const Icon(Lucide.ChevronRight),
               onTap: () async {
+                final messenger = ScaffoldMessenger.of(context);
                 final result = await PhoneControlService.requestShizuku();
-                if (mounted) setState(() => _status = result);
+                if (!mounted) return;
+                setState(() => _status = result);
+                final state = result['shizukuAuthorizationState']?.toString();
+                if (state == 'pending') {
+                  _startAuthorizationPolling();
+                } else if (state == 'not_running') {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('没有连接到 Shizuku，请先启动 Shizuku 服务。'),
+                    ),
+                  );
+                }
               },
             ),
             const Divider(height: 1),

@@ -1,23 +1,31 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
+import 'package:flutter/widgets.dart';
 import '../models/menstrual_care.dart';
 import '../services/menstrual_care_calculator.dart';
+import '../services/menstrual_care_proactive_service.dart';
 import '../services/menstrual_care_store.dart';
 import '../services/menstrual_reminder_scheduler.dart';
 import '../services/menstrual_care_proactive_scheduler.dart';
 
-class MenstrualCareProvider extends ChangeNotifier {
+class MenstrualCareProvider extends ChangeNotifier with WidgetsBindingObserver {
   MenstrualCareProvider({
     MenstrualCareStore? store,
     MenstrualReminderScheduler? scheduler,
   }) : _store = store ?? MenstrualCareStore(),
        _scheduler = scheduler ?? MenstrualReminderScheduler() {
+    WidgetsFlutterBinding.ensureInitialized().addObserver(this);
     load();
   }
   final MenstrualCareStore _store;
   final MenstrualReminderScheduler _scheduler;
   final MenstrualCareProactiveScheduler _proactiveScheduler =
       MenstrualCareProactiveScheduler();
+  final MenstrualCareProactiveService _proactiveService =
+      MenstrualCareProactiveService();
   MenstrualCareProfile? _profile;
+  Timer? _proactiveTimer;
+  bool _proactiveRunInFlight = false;
   bool _loaded = false;
   bool get loaded => _loaded;
   MenstrualCareProfile? get profile => _profile;
@@ -40,9 +48,7 @@ class MenstrualCareProvider extends ChangeNotifier {
     } catch (_) {
       // Reminder scheduling must never prevent private data from loading.
     }
-    try {
-      await _proactiveScheduler.reschedule(_profile);
-    } catch (_) {}
+    await _refreshProactiveCareSchedule(catchUp: true);
     notifyListeners();
   }
 
@@ -51,8 +57,9 @@ class MenstrualCareProvider extends ChangeNotifier {
     required int cycleDays,
     required int periodDays,
   }) async {
-    if (cycleDays < 21 || cycleDays > 45 || periodDays < 1 || periodDays > 14)
+    if (cycleDays < 21 || cycleDays > 45 || periodDays < 1 || periodDays > 14) {
       throw ArgumentError('Invalid menstrual cycle settings');
+    }
     await _save(
       MenstrualCareProfile(
         lastStartDate: dayOnly(lastStartDate),
@@ -171,9 +178,7 @@ class MenstrualCareProvider extends ChangeNotifier {
     try {
       await _scheduler.reschedule(null);
     } catch (_) {}
-    try {
-      await _proactiveScheduler.reschedule(null);
-    } catch (_) {}
+    await _refreshProactiveCareSchedule();
     notifyListeners();
   }
 
@@ -188,8 +193,78 @@ class MenstrualCareProvider extends ChangeNotifier {
     } catch (_) {
       // The saved cycle remains usable when notification permission/API fails.
     }
+    await _refreshProactiveCareSchedule(catchUp: true);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_runProactiveCareIfDue());
+    }
+  }
+
+  Future<void> _refreshProactiveCareSchedule({bool catchUp = false}) async {
+    final profile = _profile;
     try {
-      await _proactiveScheduler.reschedule(value);
-    } catch (_) {}
+      await _proactiveScheduler.reschedule(profile);
+    } catch (_) {
+      // The foreground timer below still covers an active app session.
+    }
+    _scheduleForegroundCare(profile);
+    if (catchUp) unawaited(_runProactiveCareIfDue());
+  }
+
+  void _scheduleForegroundCare(MenstrualCareProfile? profile) {
+    _proactiveTimer?.cancel();
+    _proactiveTimer = null;
+    if (profile == null || !profile.proactiveCareEnabled) return;
+
+    final now = DateTime.now();
+    final minutes = profile.proactiveCareMinutes.clamp(0, 1439).toInt();
+    var next = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      minutes ~/ 60,
+      minutes % 60,
+    );
+    if (!next.isAfter(now)) next = next.add(const Duration(days: 1));
+    _proactiveTimer = Timer(next.difference(now), () {
+      unawaited(_runProactiveCareIfDue());
+    });
+  }
+
+  Future<void> _runProactiveCareIfDue() async {
+    if (_proactiveRunInFlight || _profile?.proactiveCareEnabled != true) return;
+    _proactiveRunInFlight = true;
+    try {
+      final outcome = await _proactiveService.runIfDue();
+      _profile = await _store.read();
+      notifyListeners();
+      if (outcome == MenstrualCareProactiveOutcome.failed) {
+        // Keep an active app useful after a transient network failure. Android
+        // WorkManager performs the equivalent retry while in the background.
+        _proactiveTimer?.cancel();
+        _proactiveTimer = Timer(const Duration(minutes: 15), () {
+          unawaited(_runProactiveCareIfDue());
+        });
+      } else {
+        await _refreshProactiveCareSchedule();
+      }
+    } catch (_) {
+      _proactiveTimer?.cancel();
+      _proactiveTimer = Timer(const Duration(minutes: 15), () {
+        unawaited(_runProactiveCareIfDue());
+      });
+    } finally {
+      _proactiveRunInFlight = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _proactiveTimer?.cancel();
+    super.dispose();
   }
 }

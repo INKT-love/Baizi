@@ -4,6 +4,7 @@ import 'package:workmanager/workmanager.dart';
 
 import '../models/menstrual_care.dart';
 import 'menstrual_care_proactive_service.dart';
+import 'menstrual_care_store.dart';
 
 class MenstrualCareProactiveScheduler {
   static const taskName = 'baizi_menstrual_care_daily';
@@ -33,6 +34,10 @@ class MenstrualCareProactiveScheduler {
             ? NetworkType.connected
             : NetworkType.unmetered,
       ),
+      // A failed request should be retried during the current day instead of
+      // silently waiting until tomorrow's scheduled task.
+      backoffPolicy: BackoffPolicy.exponential,
+      backoffPolicyDelay: const Duration(minutes: 15),
     );
   }
 }
@@ -41,11 +46,14 @@ class MenstrualCareProactiveScheduler {
 void menstrualCareCallbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     if (task != MenstrualCareProactiveScheduler.taskName) return true;
-    try {
-      await MenstrualCareProactiveService().runFromBackground();
-    } catch (_) {
-      // The service persists a local error; returning success prevents retries.
+    final outcome = await MenstrualCareProactiveService().runIfDue();
+    if (outcome == MenstrualCareProactiveOutcome.failed) {
+      // Returning false asks Android WorkManager to use the configured backoff.
+      return false;
     }
+    await MenstrualCareProactiveScheduler().reschedule(
+      await MenstrualCareStore().read(),
+    );
     return true;
   });
 }

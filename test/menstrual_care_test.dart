@@ -101,6 +101,23 @@ void main() {
     );
   });
 
+  test('proactive care catches up after its configured time', () {
+    final active = MenstrualCareProfile(
+      lastStartDate: DateTime(2026, 7, 1),
+      periodDays: 3,
+      proactiveCareEnabled: true,
+      proactiveCareMinutes: 9 * 60,
+      records: [MenstrualCycleRecord(startDate: DateTime(2026, 7, 1))],
+    );
+    expect(
+      MenstrualCareProactiveLogic.evaluate(
+        active,
+        now: DateTime(2026, 7, 1, 17, 30),
+      ).shouldRun,
+      isTrue,
+    );
+  });
+
   test('recognizer only accepts explicit first-person statements', () {
     expect(
       MenstrualCareMessageRecognizer.recognize('我今天来月经了'),

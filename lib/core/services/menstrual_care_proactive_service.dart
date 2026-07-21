@@ -3,10 +3,11 @@ import '../providers/settings_provider.dart';
 import 'api/chat_api_service.dart';
 import 'chat/chat_service.dart';
 import 'menstrual_care_proactive_logic.dart';
-import 'menstrual_care_proactive_scheduler.dart';
 import 'menstrual_care_prompt_context.dart';
 import 'menstrual_care_store.dart';
 import 'menstrual_care_calculator.dart';
+
+enum MenstrualCareProactiveOutcome { sent, notDue, failed }
 
 class MenstrualCareProactiveService {
   MenstrualCareProactiveService({MenstrualCareStore? store})
@@ -14,15 +15,16 @@ class MenstrualCareProactiveService {
 
   final MenstrualCareStore _store;
 
-  Future<void> runFromBackground() async {
+  /// Generates one due care message. This is safe to call from Android's
+  /// background isolate and from the foreground catch-up path.
+  Future<MenstrualCareProactiveOutcome> runIfDue() async {
     final profile = await _store.read();
     final decision = MenstrualCareProactiveLogic.evaluate(
       profile,
       now: DateTime.now(),
     );
     if (!decision.shouldRun || profile == null) {
-      await MenstrualCareProactiveScheduler().reschedule(profile);
-      return;
+      return MenstrualCareProactiveOutcome.notDue;
     }
     final today = dayOnly(DateTime.now()).toIso8601String();
     await _store.write(profile.copyWith(proactiveCareLastAttemptDay: today));
@@ -74,19 +76,26 @@ class MenstrualCareProactiveService {
           clearProactiveCareLastError: true,
         ),
       );
+      return MenstrualCareProactiveOutcome.sent;
     } catch (error) {
       final current = await _store.read();
       if (current != null) {
         await _store.write(
           current.copyWith(
             proactiveCareLastAttemptDay: today,
-            proactiveCareLastError: error.runtimeType.toString(),
+            proactiveCareLastError: _friendlyError(error),
           ),
         );
       }
-    } finally {
-      await MenstrualCareProactiveScheduler().reschedule(await _store.read());
+      return MenstrualCareProactiveOutcome.failed;
     }
+  }
+
+  String _friendlyError(Object error) {
+    if (error is StateError) {
+      return '未能生成关怀消息：${error.message}';
+    }
+    return '未能生成关怀消息，请检查网络、API Key 和模型配置。';
   }
 
   Future<dynamic> _resolveDestination(

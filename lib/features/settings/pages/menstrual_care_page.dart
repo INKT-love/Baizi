@@ -28,7 +28,9 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
-    if (value != null) setState(() => _start = value);
+    if (value != null) {
+      setState(() => _start = value);
+    }
   }
 
   Future<void> _save() async {
@@ -42,10 +44,11 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
         periodDays: period,
       );
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('请输入 21-45 天周期与 1-14 天经期。')),
         );
+      }
     }
   }
 
@@ -308,6 +311,24 @@ class _MenstrualCarePageState extends State<MenstrualCarePage> {
                 onChanged: (value) =>
                     care.updateProactiveCare(allowMobileData: value),
               ),
+              if (profile.proactiveCareLastSuccessDay != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    '最近一次主动关怀：${profile.proactiveCareLastSuccessDay!.split('T').first}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              if (profile.proactiveCareLastError != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    profile.proactiveCareLastError!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ),
             ],
             const SizedBox(height: 12),
             Row(
